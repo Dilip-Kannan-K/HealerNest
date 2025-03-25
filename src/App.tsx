@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,6 +21,7 @@ const Connect = lazy(() => import("./pages/Connect"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const GetStarted = lazy(() => import("./pages/GetStarted"));
+const ArticleDetail = lazy(() => import("./pages/ArticleDetail"));
 
 const queryClient = new QueryClient();
 
@@ -73,6 +73,7 @@ const AnimatedRoutes = () => {
               <GetStarted />
             </Suspense>
           } />
+          <Route path="/articles/:id" element={<ArticleDetail />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
