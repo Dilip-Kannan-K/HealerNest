@@ -1,6 +1,15 @@
+
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight, Search, BookOpen, Heart, Clock, ChevronRight, Star } from "lucide-react";
+import { 
+  ArrowRight, 
+  Search, 
+  BookOpen, 
+  Heart, 
+  Clock, 
+  ChevronRight, 
+  Star as StarIcon 
+} from "lucide-react";
 
 const Articles = () => {
   const featuredArticles = [
@@ -293,15 +302,15 @@ const Articles = () => {
               </p>
               <ul className="space-y-3 mb-8">
                 <li className="flex items-start">
-                  <Star className="w-5 h-5 text-yellow-500 mt-1 mr-3" />
+                  <StarIcon className="w-5 h-5 text-yellow-500 mt-1 mr-3" />
                   <span>Monthly curated content from top mental health professionals</span>
                 </li>
                 <li className="flex items-start">
-                  <Star className="w-5 h-5 text-yellow-500 mt-1 mr-3" />
+                  <StarIcon className="w-5 h-5 text-yellow-500 mt-1 mr-3" />
                   <span>Downloadable worksheets and resources for your journey</span>
                 </li>
                 <li className="flex items-start">
-                  <Star className="w-5 h-5 text-yellow-500 mt-1 mr-3" />
+                  <StarIcon className="w-5 h-5 text-yellow-500 mt-1 mr-3" />
                   <span>Ad-free reading experience with beautiful layout</span>
                 </li>
               </ul>
