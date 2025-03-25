@@ -1,473 +1,339 @@
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { ArrowRight, Search, BookOpen, Heart, Clock, ChevronRight, Star } from "lucide-react";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Check, User, Mail, CalendarDays, Users } from "lucide-react";
-import { toast } from "sonner";
-
-// Define question types
-type QuestionType = {
-  id: number;
-  question: string;
-  type: "text" | "email" | "select" | "radio" | "checkbox";
-  options?: string[];
-  placeholder?: string;
-};
-
-// Initial user data
-type UserData = {
-  name: string;
-  email: string;
-  age: string;
-  gender: string;
-  primaryConcern: string;
-  therapyBefore: string;
-  subscriptionPlan: string;
-};
-
-const GetStarted = () => {
-  const navigate = useNavigate();
-  const [step, setStep] = useState(1);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [userData, setUserData] = useState<UserData>({
-    name: "",
-    email: "",
-    age: "",
-    gender: "",
-    primaryConcern: "",
-    therapyBefore: "",
-    subscriptionPlan: "",
-  });
-  
-  // Basic information (Step 1)
-  const basicInfo = [
+const Articles = () => {
+  const featuredArticles = [
     {
       id: 1,
-      label: "Full Name",
-      name: "name",
-      type: "text",
-      placeholder: "Enter your full name",
-      icon: <User className="h-5 w-5 text-foreground/40" />,
-      required: true
+      title: "Understanding Anxiety: Signs, Symptoms, and Coping Strategies",
+      excerpt: "Learn how to recognize anxiety and discover effective techniques to manage it in your daily life.",
+      category: "Mental Health",
+      author: "Dr. Sarah Johnson",
+      date: "June 15, 2023",
+      readTime: "8 min read",
+      image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=800&q=80"
     },
     {
       id: 2,
-      label: "Email Address",
-      name: "email",
-      type: "email",
-      placeholder: "your@email.com",
-      icon: <Mail className="h-5 w-5 text-foreground/40" />,
-      required: true
+      title: "The Power of Mindfulness: Simple Practices for Everyday Life",
+      excerpt: "Explore how mindfulness can transform your mental well-being with these practical exercises.",
+      category: "Wellness",
+      author: "Dr. Michael Chen",
+      date: "July 3, 2023",
+      readTime: "6 min read",
+      image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80"
     },
     {
       id: 3,
-      label: "Age",
-      name: "age",
-      type: "text",
-      placeholder: "Your age",
-      icon: <CalendarDays className="h-5 w-5 text-foreground/40" />,
-      required: true
-    },
+      title: "Building Resilience: How to Bounce Back from Life's Challenges",
+      excerpt: "Discover the key factors that help people recover from setbacks and emerge stronger than before.",
+      category: "Personal Growth",
+      author: "Dr. Emily Williams",
+      date: "August 21, 2023",
+      readTime: "10 min read",
+      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80"
+    }
+  ];
+
+  const recentArticles = [
     {
       id: 4,
-      label: "Gender",
-      name: "gender",
-      type: "select",
-      options: ["Male", "Female", "Non-binary", "Prefer not to say"],
-      icon: <Users className="h-5 w-5 text-foreground/40" />,
-      required: true
-    }
-  ];
-  
-  // Questionnaire (Step 2)
-  const questions: QuestionType[] = [
-    {
-      id: 1,
-      question: "What brings you to therapy today?",
-      type: "select",
-      options: [
-        "Anxiety or stress",
-        "Depression or low mood",
-        "Relationship issues",
-        "Self-improvement",
-        "Trauma recovery",
-        "Work-related stress",
-        "Other"
-      ],
+      title: "The Role of Sleep in Mental Health Recovery",
+      category: "Wellness",
+      date: "September 5, 2023",
+      readTime: "5 min read"
     },
     {
-      id: 2,
-      question: "Have you been to therapy before?",
-      type: "radio",
-      options: ["Yes", "No"],
+      id: 5,
+      title: "Communication Techniques for Healthier Relationships",
+      category: "Relationships",
+      date: "September 2, 2023",
+      readTime: "7 min read"
     },
     {
-      id: 3,
-      question: "Which subscription plan interests you?",
-      type: "radio",
-      options: ["Monthly ($79)", "2 Months ($150)", "3 Months ($210)", "6 Months ($390)", "Yearly ($750)"],
+      id: 6,
+      title: "Managing Work Stress: Finding Balance in a Busy World",
+      category: "Stress Management",
+      date: "August 28, 2023",
+      readTime: "6 min read"
+    },
+    {
+      id: 7,
+      title: "Parenting Through Difficult Times: Supporting Your Children's Mental Health",
+      category: "Parenting",
+      date: "August 22, 2023",
+      readTime: "9 min read"
     }
   ];
-  
-  // Handle basic information change
-  const handleBasicInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setUserData({ ...userData, [name]: value });
-  };
-  
-  // Handle questionnaire answer
-  const handleQuestionAnswer = (answer: string) => {
-    const currentQuestion = questions[currentQuestionIndex];
-    
-    // Update the corresponding user data field based on the question
-    switch (currentQuestion.id) {
-      case 1:
-        setUserData({ ...userData, primaryConcern: answer });
-        break;
-      case 2:
-        setUserData({ ...userData, therapyBefore: answer });
-        break;
-      case 3:
-        setUserData({ ...userData, subscriptionPlan: answer });
-        break;
-      default:
-        break;
-    }
-    
-    // Move to the next question or to the review step
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    } else {
-      // Move to step 3 (review) after all questions are answered
-      setStep(3);
-    }
-  };
-  
-  // Handle next step
-  const handleNextStep = () => {
-    // Basic validation for step 1
-    if (step === 1) {
-      if (!userData.name || !userData.email || !userData.age || !userData.gender) {
-        toast.error("Please fill in all required fields");
-        return;
-      }
-      
-      // Simple email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(userData.email)) {
-        toast.error("Please enter a valid email address");
-        return;
-      }
-      
-      setStep(2);
-    }
-  };
-  
-  // Handle submit
-  const handleSubmit = () => {
-    // In a real app, you would send the data to your backend here
-    console.log("Submitting user data:", userData);
-    
-    // Show success message
-    toast.success("Registration successful! Redirecting to connect with therapists...");
-    
-    // Simulate API call delay then redirect
-    setTimeout(() => {
-      navigate("/connect");
-    }, 2000);
-  };
-  
-  // Get current question
-  const currentQuestion = questions[currentQuestionIndex];
-  
+
+  const categories = [
+    "Mental Health", "Wellness", "Personal Growth", 
+    "Relationships", "Stress Management", "Mindfulness", 
+    "Parenting", "Trauma Recovery", "Self-Care"
+  ];
+
   return (
-    <div className="min-h-screen pt-32 pb-16">
+    <div className="pt-32 pb-16">
       <div className="container mx-auto px-6 md:px-12">
-        <div className="max-w-2xl mx-auto">
-          {/* Progress indicator */}
-          <div className="mb-10">
-            <div className="flex items-center justify-between">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center">
-                  <div 
-                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 ${
-                      step === i 
-                        ? "bg-green text-foreground" 
-                        : step > i 
-                          ? "bg-green/80 text-foreground" 
-                          : "bg-lilac/30 text-foreground/70"
-                    }`}
+        <motion.div 
+          className="text-center max-w-3xl mx-auto mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">Articles & Resources</h1>
+          <p className="text-foreground/70 text-lg">
+            Explore our collection of expert-written articles on mental health, wellness, and personal growth.
+          </p>
+        </motion.div>
+
+        <motion.div 
+          className="max-w-2xl mx-auto mb-16 relative"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search articles..."
+              className="healer-input pl-12 pr-4 py-4 w-full rounded-full shadow-sm"
+            />
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-foreground/40" />
+            </div>
+          </div>
+          <div className="flex flex-wrap justify-center mt-4 gap-2">
+            {categories.map((category, index) => (
+              <motion.button
+                key={category}
+                className="px-4 py-1 bg-white/70 backdrop-blur-sm border border-lilac/20 rounded-full text-sm hover:bg-lilac/10 transition-colors duration-200"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
+              >
+                {category}
+              </motion.button>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Featured Articles */}
+        <div className="mb-16">
+          <motion.h2 
+            className="text-2xl font-bold mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            Featured Articles
+          </motion.h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {featuredArticles.map((article, index) => (
+              <motion.div
+                key={article.id}
+                className="healer-card overflow-hidden hover-lift"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+              >
+                <div className="relative h-56">
+                  <img 
+                    src={article.image} 
+                    alt={article.title} 
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-0 left-0 m-4">
+                    <span className="px-3 py-1 bg-green/90 text-white text-xs font-medium rounded-full">
+                      {article.category}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold mb-3 line-clamp-2">{article.title}</h3>
+                  <p className="text-foreground/70 mb-4 line-clamp-3">{article.excerpt}</p>
+                  <div className="flex justify-between items-center text-sm text-foreground/60 mb-4">
+                    <span>{article.author}</span>
+                    <div className="flex items-center">
+                      <Clock className="w-4 h-4 mr-1" />
+                      {article.readTime}
+                    </div>
+                  </div>
+                  <Link 
+                    to={`/articles/${article.id}`}
+                    className="inline-flex items-center text-green font-medium hover:underline"
                   >
-                    {step > i ? <Check className="w-5 h-5" /> : i}
+                    Read More <ChevronRight className="w-4 h-4 ml-1" />
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Articles */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+          <motion.div
+            className="lg:col-span-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            <h2 className="text-2xl font-bold mb-8">Recent Articles</h2>
+            <div className="space-y-6">
+              {recentArticles.map((article) => (
+                <div 
+                  key={article.id}
+                  className="healer-card p-6 hover:border-green/50 transition-all duration-300"
+                >
+                  <div className="flex items-start">
+                    <div className="p-2 bg-lilac/10 rounded-full mr-4">
+                      <BookOpen className="w-5 h-5 text-lilac" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex flex-wrap justify-between items-start mb-2">
+                        <span className="px-3 py-1 bg-lilac/10 text-foreground/80 text-xs font-medium rounded-full mb-2">
+                          {article.category}
+                        </span>
+                        <div className="flex items-center text-sm text-foreground/60">
+                          <Clock className="w-4 h-4 mr-1" />
+                          {article.readTime}
+                        </div>
+                      </div>
+                      <h3 className="text-lg font-semibold mb-1">{article.title}</h3>
+                      <p className="text-sm text-foreground/60 mb-3">{article.date}</p>
+                      <Link 
+                        to={`/articles/${article.id}`}
+                        className="inline-flex items-center text-green font-medium hover:underline text-sm"
+                      >
+                        Read Article <ChevronRight className="w-4 h-4 ml-1" />
+                      </Link>
+                    </div>
                   </div>
-                  <div className={`text-sm ml-2 ${step >= i ? "text-foreground" : "text-foreground/50"}`}>
-                    {i === 1 ? "Your Info" : i === 2 ? "Questionnaire" : "Review"}
-                  </div>
-                  {i < 3 && (
-                    <div 
-                      className={`w-12 md:w-24 h-1 mx-2 rounded ${
-                        step > i ? "bg-green/80" : "bg-lilac/30"
-                      }`}
-                    ></div>
-                  )}
                 </div>
               ))}
             </div>
-          </div>
-          
-          {/* Content based on current step */}
-          <motion.div 
-            className="glass-panel p-8 md:p-10"
+            <div className="mt-8 text-center">
+              <a 
+                href="#" 
+                className="primary-button inline-flex items-center"
+              >
+                View All Articles <ArrowRight className="ml-2 w-4 h-4" />
+              </a>
+            </div>
+          </motion.div>
+
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
           >
-            <AnimatePresence mode="wait">
-              {/* Step 1: Basic Information */}
-              {step === 1 && (
-                <motion.div
-                  key="step1"
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 30 }}
-                  transition={{ duration: 0.4 }}
+            <div className="healer-card p-8">
+              <h3 className="text-xl font-semibold mb-6">Write for Us</h3>
+              <p className="text-foreground/70 mb-6">
+                Have knowledge to share? Submit your article and become a contributor to our growing community.
+              </p>
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-start">
+                  <Heart className="w-4 h-4 text-green mt-1 mr-2" />
+                  <span className="text-sm">Share your expertise and insights</span>
+                </li>
+                <li className="flex items-start">
+                  <Heart className="w-4 h-4 text-green mt-1 mr-2" />
+                  <span className="text-sm">Get published in our monthly e-magazine</span>
+                </li>
+                <li className="flex items-start">
+                  <Heart className="w-4 h-4 text-green mt-1 mr-2" />
+                  <span className="text-sm">Connect with a community of healing</span>
+                </li>
+              </ul>
+              <a 
+                href="#" 
+                className="block w-full py-3 text-center rounded-full bg-green text-foreground font-medium hover:bg-green/90 transition-all duration-300"
+              >
+                Submit Your Article
+              </a>
+            </div>
+
+            <div className="healer-card p-8 mt-8">
+              <h3 className="text-xl font-semibold mb-6">Subscribe to Our Newsletter</h3>
+              <p className="text-foreground/70 mb-6">
+                Get the latest articles and resources delivered straight to your inbox.
+              </p>
+              <div className="space-y-4">
+                <input
+                  type="email"
+                  placeholder="Your email address"
+                  className="healer-input w-full"
+                />
+                <button 
+                  className="block w-full py-3 text-center rounded-full bg-lilac text-foreground font-medium hover:bg-lilac/90 transition-all duration-300"
                 >
-                  <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold mb-2">Tell us about yourself</h2>
-                    <p className="text-foreground/70">
-                      Let's start with some basic information
-                    </p>
-                  </div>
-                  
-                  <form className="space-y-5">
-                    {basicInfo.map((field) => (
-                      <div key={field.id} className="space-y-2">
-                        <label htmlFor={field.name} className="block text-sm font-medium">
-                          {field.label} {field.required && <span className="text-red-500">*</span>}
-                        </label>
-                        
-                        {field.type === "select" ? (
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              {field.icon}
-                            </div>
-                            <select
-                              id={field.name}
-                              name={field.name}
-                              value={(userData as any)[field.name]}
-                              onChange={handleBasicInfoChange}
-                              className="healer-input pl-10 w-full appearance-none"
-                              required={field.required}
-                            >
-                              <option value="">Select {field.label}</option>
-                              {field.options?.map((option) => (
-                                <option key={option} value={option}>
-                                  {option}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        ) : (
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              {field.icon}
-                            </div>
-                            <input
-                              type={field.type}
-                              id={field.name}
-                              name={field.name}
-                              className="healer-input pl-10 w-full"
-                              placeholder={field.placeholder}
-                              value={(userData as any)[field.name]}
-                              onChange={handleBasicInfoChange}
-                              required={field.required}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                    
-                    <div className="pt-4">
-                      <button
-                        type="button"
-                        onClick={handleNextStep}
-                        className="primary-button w-full flex items-center justify-center"
-                      >
-                        Continue <ArrowRight className="ml-2 w-4 h-4" />
-                      </button>
-                    </div>
-                  </form>
-                </motion.div>
-              )}
-              
-              {/* Step 2: Questionnaire */}
-              {step === 2 && (
-                <motion.div
-                  key="step2"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.05 }}
-                  transition={{ duration: 0.4 }}
-                  className="text-center"
-                >
-                  <h2 className="text-2xl font-bold mb-8">Questionnaire</h2>
-                  
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={currentQuestion.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.4 }}
-                      className="space-y-8"
-                    >
-                      <h3 className="text-xl font-medium">{currentQuestion.question}</h3>
-                      
-                      <div className="space-y-3">
-                        {currentQuestion.type === "radio" && (
-                          <div className="space-y-3">
-                            {currentQuestion.options?.map((option) => (
-                              <button
-                                key={option}
-                                type="button"
-                                onClick={() => handleQuestionAnswer(option)}
-                                className="w-full text-left p-4 rounded-lg border border-lilac/30 hover:border-green/70 hover:bg-green/5 transition-colors duration-200"
-                              >
-                                {option}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                        
-                        {currentQuestion.type === "select" && (
-                          <div className="space-y-3">
-                            {currentQuestion.options?.map((option) => (
-                              <button
-                                key={option}
-                                type="button"
-                                onClick={() => handleQuestionAnswer(option)}
-                                className="w-full text-left p-4 rounded-lg border border-lilac/30 hover:border-green/70 hover:bg-green/5 transition-colors duration-200"
-                              >
-                                {option}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="text-sm text-foreground/60">
-                        Question {currentQuestionIndex + 1} of {questions.length}
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
-                  
-                  <div className="mt-8 flex">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (currentQuestionIndex > 0) {
-                          setCurrentQuestionIndex(currentQuestionIndex - 1);
-                        } else {
-                          setStep(1);
-                        }
-                      }}
-                      className="outline-button mr-4"
-                    >
-                      <ArrowLeft className="mr-2 w-4 h-4" /> Back
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-              
-              {/* Step 3: Review */}
-              {step === 3 && (
-                <motion.div
-                  key="step3"
-                  initial={{ opacity: 0, x: 30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -30 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold mb-2">Review Your Information</h2>
-                    <p className="text-foreground/70">
-                      Please review your information before submitting
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <div className="bg-lilac/10 p-6 rounded-lg">
-                      <h3 className="font-medium mb-4">Personal Information</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm text-foreground/70">Full Name</p>
-                          <p className="font-medium">{userData.name}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-foreground/70">Email</p>
-                          <p className="font-medium">{userData.email}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-foreground/70">Age</p>
-                          <p className="font-medium">{userData.age}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-foreground/70">Gender</p>
-                          <p className="font-medium">{userData.gender}</p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-green/10 p-6 rounded-lg">
-                      <h3 className="font-medium mb-4">Questionnaire Responses</h3>
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-sm text-foreground/70">Primary Concern</p>
-                          <p className="font-medium">{userData.primaryConcern}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-foreground/70">Previous Therapy Experience</p>
-                          <p className="font-medium">{userData.therapyBefore}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-foreground/70">Selected Subscription Plan</p>
-                          <p className="font-medium">{userData.subscriptionPlan}</p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-4 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                      <button
-                        type="button"
-                        onClick={() => setCurrentQuestionIndex(questions.length - 1) || setStep(2)}
-                        className="outline-button sm:flex-1"
-                      >
-                        <ArrowLeft className="mr-2 w-4 h-4" /> Back
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleSubmit}
-                        className="primary-button sm:flex-1"
-                      >
-                        Complete Registration <ArrowRight className="ml-2 w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  Subscribe
+                </button>
+              </div>
+            </div>
           </motion.div>
-          
-          {/* Bottom link */}
-          <div className="text-center mt-6">
-            <Link to="/" className="text-foreground/70 hover:text-green transition-colors duration-200">
-              <ArrowLeft className="w-4 h-4 inline mr-1" /> Back to home
-            </Link>
-          </div>
         </div>
+
+        {/* Premium E-Magazine Promotion */}
+        <motion.div
+          className="bg-gradient-to-r from-lilac/30 to-green/30 rounded-xl p-8 mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
+        >
+          <div className="flex flex-col lg:flex-row items-center justify-between">
+            <div className="lg:w-2/3 mb-8 lg:mb-0">
+              <div className="bg-white/30 text-green rounded-full px-4 py-1 text-sm font-semibold w-fit mb-4">
+                Premium Content
+              </div>
+              <h3 className="text-2xl font-bold mb-4">Subscribe to Our Premium E-Magazine</h3>
+              <p className="text-lg mb-6">
+                Unlock exclusive content, in-depth analyses, and expert advice not available in our free articles.
+              </p>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start">
+                  <Star className="w-5 h-5 text-yellow-500 mt-1 mr-3" />
+                  <span>Monthly curated content from top mental health professionals</span>
+                </li>
+                <li className="flex items-start">
+                  <Star className="w-5 h-5 text-yellow-500 mt-1 mr-3" />
+                  <span>Downloadable worksheets and resources for your journey</span>
+                </li>
+                <li className="flex items-start">
+                  <Star className="w-5 h-5 text-yellow-500 mt-1 mr-3" />
+                  <span>Ad-free reading experience with beautiful layout</span>
+                </li>
+              </ul>
+              <div className="flex items-center gap-6">
+                <a 
+                  href="#" 
+                  className="primary-button"
+                >
+                  Subscribe Now
+                </a>
+                <span className="text-xl font-bold">$4.99/month</span>
+              </div>
+            </div>
+            <div className="lg:w-1/3 relative">
+              <div className="absolute -inset-4 bg-white/30 rounded-lg blur-lg"></div>
+              <img 
+                src="https://images.unsplash.com/photo-1585828922344-85c9daa264b0?auto=format&fit=crop&w=400&q=80" 
+                alt="E-Magazine Preview" 
+                className="relative rounded-lg shadow-lg mx-auto"
+              />
+              <div className="absolute top-0 right-0 bg-green/90 text-white rounded-full px-4 py-1 text-sm font-bold m-4">
+                New Issue!
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
 };
 
-export default GetStarted;
+export default Articles;

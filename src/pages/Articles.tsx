@@ -1,7 +1,6 @@
-
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight, Search, BookOpen, Heart, Clock, ChevronRight } from "lucide-react";
+import { ArrowRight, Search, BookOpen, Heart, Clock, ChevronRight, Star } from "lucide-react";
 
 const Articles = () => {
   const featuredArticles = [
