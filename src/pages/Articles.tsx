@@ -119,7 +119,6 @@ const Articles = () => {
           </div>
         </motion.div>
 
-        {/* Featured Articles */}
         <div className="mb-16">
           <motion.h2 
             className="text-2xl font-bold mb-8"
@@ -173,7 +172,6 @@ const Articles = () => {
           </div>
         </div>
 
-        {/* Recent Articles */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
           <motion.div
             className="lg:col-span-2"
@@ -278,7 +276,6 @@ const Articles = () => {
           </motion.div>
         </div>
 
-        {/* Premium E-Magazine Promotion */}
         <motion.div
           className="bg-gradient-to-r from-lilac/30 to-green/30 rounded-xl p-8 mb-12"
           initial={{ opacity: 0, y: 20 }}
