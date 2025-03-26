@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '@/hooks';
 import { Clock, Calendar, Video, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -13,8 +13,14 @@ const SessionInterface: React.FC = () => {
   const { sessionType, therapyType, selectedDate, selectedTime } = useAppSelector(state => state.session);
   const navigate = useNavigate();
   
+  useEffect(() => {
+    if (!selectedTherapist || !sessionType || !selectedDate || !selectedTime) {
+      navigate('/connect');
+    }
+  }, [selectedTherapist, sessionType, selectedDate, selectedTime, navigate]);
+
+  // If we don't have required data and the above useEffect hasn't redirected yet
   if (!selectedTherapist || !sessionType || !selectedDate || !selectedTime) {
-    navigate('/connect');
     return null;
   }
 

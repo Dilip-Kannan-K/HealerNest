@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { useAppSelector } from "@/hooks";
+import { useAppSelector, useAppDispatch } from "@/hooks";
 import TherapistProfile from "@/components/therapist/TherapistProfile";
 import TherapistScheduler from "@/components/therapist/TherapistScheduler";
 import ClientDashboardPreview from "@/components/connect/ClientDashboardPreview";
@@ -10,8 +10,10 @@ import CommunicationPlatform from "@/components/connect/CommunicationPlatform";
 import TherapistList from "@/components/connect/TherapistList";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { setSchedulerOpen } from "@/store/therapistSlice";
 
 const Connect = () => {
+  const dispatch = useAppDispatch();
   const { selectedTherapist, isSchedulerOpen } = useAppSelector(state => state.therapist);
   const { sessionType, therapyType, selectedDate, selectedTime } = useAppSelector(state => state.session);
   const navigate = useNavigate();
@@ -19,9 +21,13 @@ const Connect = () => {
   // If a user has selected all required session details, redirect to the session interface
   useEffect(() => {
     if (selectedTherapist && sessionType && therapyType && selectedDate && selectedTime && !isSchedulerOpen) {
+      // Close the scheduler if it's open before navigating
+      if (isSchedulerOpen) {
+        dispatch(setSchedulerOpen(false));
+      }
       navigate('/session');
     }
-  }, [selectedTherapist, sessionType, therapyType, selectedDate, selectedTime, isSchedulerOpen, navigate]);
+  }, [selectedTherapist, sessionType, therapyType, selectedDate, selectedTime, isSchedulerOpen, navigate, dispatch]);
 
   return (
     <div className="pt-32 pb-16">
