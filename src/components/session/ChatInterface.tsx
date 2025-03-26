@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Paperclip, Smile } from 'lucide-react';
+import { Send, Paperclip, Smile, Lock } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Therapist } from '@/store/therapistSlice';
@@ -27,6 +27,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ therapist }) => {
     }
   ]);
   
+  // Simulate if the user has subscribed to this therapist
+  // In a real app, this would come from your subscription service
+  const hasSubscribed = therapist.available; // Using available as a proxy for subscription status
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Auto scroll to bottom on new messages
@@ -35,7 +39,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ therapist }) => {
   }, [messages]);
   
   const handleSendMessage = () => {
-    if (message.trim() === '') return;
+    if (message.trim() === '' || !hasSubscribed) return;
     
     // Add user message
     const newMessage: Message = {
@@ -74,6 +78,25 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ therapist }) => {
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
+  
+  if (!hasSubscribed) {
+    return (
+      <div className="flex flex-col h-[600px] items-center justify-center">
+        <div className="text-center p-8 max-w-md">
+          <div className="bg-foreground/5 rounded-full p-4 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <Lock className="h-8 w-8 text-foreground/50" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">Chat Access Locked</h3>
+          <p className="text-foreground/70 mb-4">
+            You haven't subscribed to sessions with {therapist.name} yet. Subscribe to unlock chat functionality.
+          </p>
+          <Button className="bg-green hover:bg-green/90">
+            Subscribe Now
+          </Button>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="flex flex-col h-[600px]">

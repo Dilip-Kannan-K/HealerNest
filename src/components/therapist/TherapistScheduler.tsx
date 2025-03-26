@@ -10,9 +10,11 @@ import {
 } from '@/store/sessionSlice';
 import { setSchedulerOpen } from '@/store/therapistSlice';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { useNavigate } from 'react-router-dom';
 
 const TherapistScheduler: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { selectedTherapist, isSchedulerOpen } = useAppSelector(state => state.therapist);
   const { sessionType, therapyType, selectedDate, selectedTime } = useAppSelector(state => state.session);
   
@@ -36,6 +38,11 @@ const TherapistScheduler: React.FC = () => {
 
   const handleTimeSelect = (time: string) => {
     dispatch(setSelectedTime(time));
+  };
+
+  const navigateToSession = () => {
+    dispatch(setSchedulerOpen(false));
+    navigate('/session');
   };
 
   const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -143,8 +150,9 @@ const TherapistScheduler: React.FC = () => {
                   : ''
               }`}
               disabled={!sessionType || !therapyType || !selectedDate || !selectedTime}
+              onClick={navigateToSession}
             >
-              Continue to Checkout
+              Start Session
             </button>
           </div>
         </div>

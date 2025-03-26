@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Mic, MicOff, Video as VideoIcon, VideoOff, Phone, MessageSquare } from 'lucide-react';
+import { Mic, MicOff, Video as VideoIcon, VideoOff, Phone, MessageSquare, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Therapist } from '@/store/therapistSlice';
 
@@ -13,11 +13,34 @@ const VideoCall: React.FC<VideoCallProps> = ({ therapist }) => {
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isCallStarted, setIsCallStarted] = useState(false);
   
+  // Simulate if the user has subscribed to this therapist
+  // In a real app, this would come from your subscription service
+  const hasSubscribed = therapist.available; // Using available as a proxy for subscription status
+  
   const toggleMic = () => setIsMicOn(!isMicOn);
   const toggleVideo = () => setIsVideoOn(!isVideoOn);
   
   const startCall = () => setIsCallStarted(true);
   const endCall = () => setIsCallStarted(false);
+  
+  if (!hasSubscribed) {
+    return (
+      <div className="h-[600px] flex items-center justify-center">
+        <div className="text-center p-8 max-w-md">
+          <div className="bg-foreground/5 rounded-full p-4 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <Lock className="h-8 w-8 text-foreground/50" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">Video Access Locked</h3>
+          <p className="text-foreground/70 mb-4">
+            You haven't subscribed to sessions with {therapist.name} yet. Subscribe to unlock video calls.
+          </p>
+          <Button className="bg-green hover:bg-green/90">
+            Subscribe Now
+          </Button>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="h-[600px] flex flex-col">

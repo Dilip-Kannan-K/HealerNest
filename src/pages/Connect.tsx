@@ -18,16 +18,8 @@ const Connect = () => {
   const { sessionType, therapyType, selectedDate, selectedTime } = useAppSelector(state => state.session);
   const navigate = useNavigate();
   
-  // If a user has selected all required session details, redirect to the session interface
-  useEffect(() => {
-    if (selectedTherapist && sessionType && therapyType && selectedDate && selectedTime && !isSchedulerOpen) {
-      // Close the scheduler if it's open before navigating
-      if (isSchedulerOpen) {
-        dispatch(setSchedulerOpen(false));
-      }
-      navigate('/session');
-    }
-  }, [selectedTherapist, sessionType, therapyType, selectedDate, selectedTime, isSchedulerOpen, navigate, dispatch]);
+  // We're removing the automatic navigation to the session page
+  // Instead we'll provide a button in the TherapistScheduler component
 
   return (
     <div className="pt-32 pb-16">

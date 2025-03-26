@@ -1,8 +1,10 @@
 
 import React from 'react';
-import { Clock, Calendar, Star, MessageSquare, Video } from 'lucide-react';
+import { Clock, Calendar, Star, MessageSquare, Video, Lock } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Therapist } from '@/store/therapistSlice';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface TherapistSummaryProps {
   therapist: Therapist;
@@ -19,6 +21,8 @@ const TherapistSummary: React.FC<TherapistSummaryProps> = ({
   selectedDate,
   selectedTime
 }) => {
+  const navigate = useNavigate();
+  
   // Calculate session price based on session type
   const getSessionPrice = () => {
     switch (sessionType) {
@@ -133,6 +137,14 @@ const TherapistSummary: React.FC<TherapistSummaryProps> = ({
           </div>
         </CardContent>
       </Card>
+      
+      <Button
+        onClick={() => navigate('/connect')}
+        variant="outline" 
+        className="w-full"
+      >
+        Back to Connect
+      </Button>
       
       <div className="text-sm text-foreground/60 mt-4">
         <p>Need help? <a href="#" className="text-green hover:underline">Contact Support</a></p>
