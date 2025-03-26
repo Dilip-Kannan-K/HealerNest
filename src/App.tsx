@@ -25,6 +25,7 @@ const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const GetStarted = lazy(() => import("./pages/GetStarted"));
 const ArticleDetail = lazy(() => import("./pages/ArticleDetail"));
+const Session = lazy(() => import("./pages/Session"));
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,11 @@ const AnimatedRoutes = () => {
           <Route path="connect" element={
             <Suspense fallback={<div className="w-full h-screen flex items-center justify-center"><div className="animate-pulse-gentle text-lilac">Loading...</div></div>}>
               <Connect />
+            </Suspense>
+          } />
+          <Route path="session" element={
+            <Suspense fallback={<div className="w-full h-screen flex items-center justify-center"><div className="animate-pulse-gentle text-lilac">Loading...</div></div>}>
+              <Session />
             </Suspense>
           } />
           <Route path="login" element={

@@ -8,9 +8,20 @@ import AppFeatures from "@/components/connect/AppFeatures";
 import SessionTypes from "@/components/connect/SessionTypes";
 import CommunicationPlatform from "@/components/connect/CommunicationPlatform";
 import TherapistList from "@/components/connect/TherapistList";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const Connect = () => {
-  const { selectedTherapist } = useAppSelector(state => state.therapist);
+  const { selectedTherapist, isSchedulerOpen } = useAppSelector(state => state.therapist);
+  const { sessionType, therapyType, selectedDate, selectedTime } = useAppSelector(state => state.session);
+  const navigate = useNavigate();
+  
+  // If a user has selected all required session details, redirect to the session interface
+  useEffect(() => {
+    if (selectedTherapist && sessionType && therapyType && selectedDate && selectedTime && !isSchedulerOpen) {
+      navigate('/session');
+    }
+  }, [selectedTherapist, sessionType, therapyType, selectedDate, selectedTime, isSchedulerOpen, navigate]);
 
   return (
     <div className="pt-32 pb-16">
