@@ -8,8 +8,8 @@ import AppFeatures from "@/components/connect/AppFeatures";
 import SessionTypes from "@/components/connect/SessionTypes";
 import CommunicationPlatform from "@/components/connect/CommunicationPlatform";
 import TherapistList from "@/components/connect/TherapistList";
+import WebinarSessions from "@/components/connect/WebinarSessions";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import { setSchedulerOpen } from "@/store/therapistSlice";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -55,6 +55,10 @@ const Connect = () => {
         <AppFeatures />
         <SessionTypes />
         <CommunicationPlatform />
+        
+        {/* Add Webinar Sessions section */}
+        <WebinarSessions />
+        
         <TherapistList />
 
         {/* Render therapist profile and scheduler components */}
