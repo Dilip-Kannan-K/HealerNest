@@ -11,6 +11,7 @@ import {
 import { setSchedulerOpen } from '@/store/therapistSlice';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useNavigate } from 'react-router-dom';
+import { toast } from "sonner";
 
 const TherapistScheduler: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -41,8 +42,16 @@ const TherapistScheduler: React.FC = () => {
   };
 
   const navigateToSession = () => {
+    if (!sessionType || !therapyType || !selectedDate || !selectedTime) {
+      toast.error("Please select all session details before proceeding");
+      return;
+    }
+    
     dispatch(setSchedulerOpen(false));
-    navigate('/session');
+    // Add a small delay to ensure the dialog closes smoothly before navigation
+    setTimeout(() => {
+      navigate('/session');
+    }, 100);
   };
 
   const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -144,7 +153,7 @@ const TherapistScheduler: React.FC = () => {
             </div>
             
             <button 
-              className={`primary-button w-full ${
+              className={`w-full py-3 px-6 rounded-full bg-green text-white font-medium hover:bg-green/90 transition-colors ${
                 !sessionType || !therapyType || !selectedDate || !selectedTime
                   ? 'opacity-70 cursor-not-allowed'
                   : ''

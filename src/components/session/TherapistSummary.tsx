@@ -12,6 +12,8 @@ interface TherapistSummaryProps {
   therapyType: 'individual' | 'couples' | 'family' | null;
   selectedDate: string | null;
   selectedTime: string | null;
+  isSubscribed?: boolean;
+  onSubscribe?: () => void;
 }
 
 const TherapistSummary: React.FC<TherapistSummaryProps> = ({
@@ -19,7 +21,9 @@ const TherapistSummary: React.FC<TherapistSummaryProps> = ({
   sessionType,
   therapyType,
   selectedDate,
-  selectedTime
+  selectedTime,
+  isSubscribed = true,
+  onSubscribe = () => {}
 }) => {
   const navigate = useNavigate();
   
@@ -130,9 +134,18 @@ const TherapistSummary: React.FC<TherapistSummaryProps> = ({
               <span className="font-medium">Pay Per Session</span>
             </div>
             <div className="pt-3 border-t border-foreground/10">
-              <button className="w-full py-2 bg-green text-white rounded-full text-sm font-medium hover:bg-green/90 transition-colors">
-                Upgrade to Monthly Plan
-              </button>
+              {isSubscribed ? (
+                <div className="py-2 bg-green/10 text-center text-green rounded-full text-sm font-medium">
+                  Active Subscription
+                </div>
+              ) : (
+                <button 
+                  onClick={onSubscribe}
+                  className="w-full py-2 bg-green text-white rounded-full text-sm font-medium hover:bg-green/90 transition-colors"
+                >
+                  Subscribe Now
+                </button>
+              )}
             </div>
           </div>
         </CardContent>

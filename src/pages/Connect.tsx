@@ -11,6 +11,8 @@ import TherapistList from "@/components/connect/TherapistList";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { setSchedulerOpen } from "@/store/therapistSlice";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 
 const Connect = () => {
   const dispatch = useAppDispatch();
@@ -18,8 +20,12 @@ const Connect = () => {
   const { sessionType, therapyType, selectedDate, selectedTime } = useAppSelector(state => state.session);
   const navigate = useNavigate();
   
-  // We're removing the automatic navigation to the session page
-  // Instead we'll provide a button in the TherapistScheduler component
+  // Check if a session is already scheduled and ready to go
+  const isSessionReady = selectedTherapist && sessionType && therapyType && selectedDate && selectedTime;
+  
+  const goToSession = () => {
+    navigate('/session');
+  };
 
   return (
     <div className="pt-32 pb-16">
@@ -31,9 +37,18 @@ const Connect = () => {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Connect with Our Therapists</h1>
-          <p className="text-foreground/70 text-lg">
+          <p className="text-foreground/70 text-lg mb-6">
             Our licensed professionals are here to support you through your healing journey. Schedule a session in the format that works best for you.
           </p>
+          
+          {isSessionReady && (
+            <Button 
+              onClick={goToSession}
+              className="bg-green hover:bg-green/90 text-white"
+            >
+              Go to Your Scheduled Session <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          )}
         </motion.div>
 
         <ClientDashboardPreview />
