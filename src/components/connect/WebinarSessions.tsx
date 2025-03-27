@@ -1,23 +1,14 @@
 
 import React, { useState } from 'react';
 import { motion } from "framer-motion";
-import { Calendar, Clock, Users, Video, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { 
-  Card, 
-  CardHeader, 
-  CardTitle, 
-  CardContent,
-  CardFooter,
-  CardDescription
-} from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { ExternalLink } from "lucide-react";
+import WebinarCard, { WebinarData } from "./WebinarCard";
+import WebinarFilter from "./WebinarFilter";
 
 const WebinarSessions = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  const webinars = [
+  const webinars: WebinarData[] = [
     {
       id: 1,
       title: "Managing Anxiety in Uncertain Times",
@@ -112,63 +103,18 @@ const WebinarSessions = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="all" value={selectedCategory} onValueChange={setSelectedCategory} className="w-fit mb-6">
-        <TabsList className="mb-4">
-          <TabsTrigger value="all">All Topics</TabsTrigger>
-          <TabsTrigger value="anxiety">Anxiety</TabsTrigger>
-          <TabsTrigger value="mindfulness">Mindfulness</TabsTrigger>
-          <TabsTrigger value="relationships">Relationships</TabsTrigger>
-          <TabsTrigger value="wellness">Wellness</TabsTrigger>
-          <TabsTrigger value="parenting">Parenting</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <WebinarFilter 
+        selectedCategory={selectedCategory} 
+        onCategoryChange={setSelectedCategory} 
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredWebinars.map((webinar) => (
-          <Card key={webinar.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 border border-foreground/10">
-            <CardHeader className="pb-2">
-              <div className="flex justify-between items-start">
-                <Badge variant="outline" className="bg-green/10 text-green border-green mb-2 hover:bg-green/20">
-                  {webinar.category.charAt(0).toUpperCase() + webinar.category.slice(1)}
-                </Badge>
-                <Badge variant="outline" className="bg-lilac/10 text-foreground border-lilac">
-                  <Users className="w-3 h-3 mr-1" />
-                  {webinar.seats} seats left
-                </Badge>
-              </div>
-              <CardTitle className="text-xl">{webinar.title}</CardTitle>
-              <CardDescription className="mt-2">{webinar.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 pb-4">
-              <div className="flex items-center text-sm">
-                <Calendar className="w-4 h-4 mr-2 text-green" />
-                {webinar.date}
-              </div>
-              <div className="flex items-center text-sm">
-                <Clock className="w-4 h-4 mr-2 text-green" />
-                {webinar.time}
-              </div>
-              <div className="flex items-center text-sm">
-                <Users className="w-4 h-4 mr-2 text-green" />
-                {webinar.speaker}
-              </div>
-              <div className="w-full bg-foreground/10 rounded-full h-2 mt-1">
-                <div 
-                  className="bg-green h-2 rounded-full" 
-                  style={{ width: `${(webinar.seats / webinar.totalSeats) * 100}%` }}
-                ></div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                className="w-full bg-green hover:bg-green/90 text-white"
-                onClick={() => handleRegister(webinar.id)}
-              >
-                <Video className="w-4 h-4 mr-1" />
-                Register for Webinar
-              </Button>
-            </CardFooter>
-          </Card>
+          <WebinarCard 
+            key={webinar.id} 
+            webinar={webinar} 
+            onRegister={handleRegister} 
+          />
         ))}
       </div>
 
