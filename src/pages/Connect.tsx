@@ -51,16 +51,14 @@ const Connect = () => {
           )}
         </motion.div>
 
-        <ClientDashboardPreview />
-        <AppFeatures />
+        {/* Reordered sections as requested */}
         <SessionTypes />
+        <TherapistList />
+        <WebinarSessions />
+        <AppFeatures />
+        <ClientDashboardPreview />
         <CommunicationPlatform />
         
-        {/* Add Webinar Sessions section */}
-        <WebinarSessions />
-        
-        <TherapistList />
-
         {/* Render therapist profile and scheduler components */}
         {selectedTherapist && <TherapistProfile />}
         <TherapistScheduler />

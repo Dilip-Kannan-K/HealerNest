@@ -2,22 +2,17 @@
 import React, { useState } from 'react';
 import { motion } from "framer-motion";
 import { Calendar, Clock, Users, Video, ExternalLink } from "lucide-react";
-import { 
-  Table, 
-  TableHeader, 
-  TableBody, 
-  TableRow, 
-  TableHead, 
-  TableCell 
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { 
   Card, 
   CardHeader, 
   CardTitle, 
-  CardContent 
+  CardContent,
+  CardFooter,
+  CardDescription
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 const WebinarSessions = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -117,90 +112,65 @@ const WebinarSessions = () => {
         </div>
       </div>
 
-      <Card className="border border-foreground/10 shadow-md">
-        <CardHeader className="bg-foreground/5 border-b border-foreground/10">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <CardTitle>Upcoming Webinars</CardTitle>
-            <Tabs defaultValue="all" value={selectedCategory} onValueChange={setSelectedCategory}>
-              <TabsList>
-                <TabsTrigger value="all">All Topics</TabsTrigger>
-                <TabsTrigger value="anxiety">Anxiety</TabsTrigger>
-                <TabsTrigger value="mindfulness">Mindfulness</TabsTrigger>
-                <TabsTrigger value="relationships">Relationships</TabsTrigger>
-                <TabsTrigger value="wellness">Wellness</TabsTrigger>
-                <TabsTrigger value="parenting">Parenting</TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Webinar</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Time</TableHead>
-                <TableHead>Speaker</TableHead>
-                <TableHead>Availability</TableHead>
-                <TableHead className="text-right">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredWebinars.map((webinar) => (
-                <TableRow key={webinar.id}>
-                  <TableCell className="font-medium">
-                    <div>
-                      <p className="font-semibold">{webinar.title}</p>
-                      <p className="text-sm text-foreground/70 mt-1">{webinar.description}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-2 text-green" />
-                      {webinar.date}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <Clock className="w-4 h-4 mr-2 text-green" />
-                      {webinar.time}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <Users className="w-4 h-4 mr-2 text-green" />
-                      {webinar.speaker}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="text-sm">
-                        {webinar.seats} of {webinar.totalSeats} seats available
-                      </div>
-                      <div className="w-full bg-foreground/10 rounded-full h-2 mt-1">
-                        <div 
-                          className="bg-green h-2 rounded-full" 
-                          style={{ width: `${(webinar.seats / webinar.totalSeats) * 100}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button 
-                      size="sm" 
-                      className="bg-green hover:bg-green/90 text-white"
-                      onClick={() => handleRegister(webinar.id)}
-                    >
-                      <Video className="w-4 h-4 mr-1" />
-                      Register
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <Tabs defaultValue="all" value={selectedCategory} onValueChange={setSelectedCategory} className="w-fit mb-6">
+        <TabsList className="mb-4">
+          <TabsTrigger value="all">All Topics</TabsTrigger>
+          <TabsTrigger value="anxiety">Anxiety</TabsTrigger>
+          <TabsTrigger value="mindfulness">Mindfulness</TabsTrigger>
+          <TabsTrigger value="relationships">Relationships</TabsTrigger>
+          <TabsTrigger value="wellness">Wellness</TabsTrigger>
+          <TabsTrigger value="parenting">Parenting</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredWebinars.map((webinar) => (
+          <Card key={webinar.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 border border-foreground/10">
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-start">
+                <Badge variant="outline" className="bg-green/10 text-green border-green mb-2 hover:bg-green/20">
+                  {webinar.category.charAt(0).toUpperCase() + webinar.category.slice(1)}
+                </Badge>
+                <Badge variant="outline" className="bg-lilac/10 text-foreground border-lilac">
+                  <Users className="w-3 h-3 mr-1" />
+                  {webinar.seats} seats left
+                </Badge>
+              </div>
+              <CardTitle className="text-xl">{webinar.title}</CardTitle>
+              <CardDescription className="mt-2">{webinar.description}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 pb-4">
+              <div className="flex items-center text-sm">
+                <Calendar className="w-4 h-4 mr-2 text-green" />
+                {webinar.date}
+              </div>
+              <div className="flex items-center text-sm">
+                <Clock className="w-4 h-4 mr-2 text-green" />
+                {webinar.time}
+              </div>
+              <div className="flex items-center text-sm">
+                <Users className="w-4 h-4 mr-2 text-green" />
+                {webinar.speaker}
+              </div>
+              <div className="w-full bg-foreground/10 rounded-full h-2 mt-1">
+                <div 
+                  className="bg-green h-2 rounded-full" 
+                  style={{ width: `${(webinar.seats / webinar.totalSeats) * 100}%` }}
+                ></div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button 
+                className="w-full bg-green hover:bg-green/90 text-white"
+                onClick={() => handleRegister(webinar.id)}
+              >
+                <Video className="w-4 h-4 mr-1" />
+                Register for Webinar
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
 
       <div className="mt-6 text-center">
         <p className="text-sm text-foreground/70">
