@@ -3,10 +3,13 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Leaf, Menu, X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import UserProfileButton from "@/components/profile/UserProfileButton";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,30 +79,36 @@ const Header = () => {
             </nav>
             
             <div className="flex items-center space-x-4">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: 0.7 }}
-              >
-                <Link
-                  to="/login"
-                  className="px-5 py-2 rounded-full border-2 border-lilac text-foreground hover:bg-lilac/10 transition-all duration-200"
-                >
-                  Login
-                </Link>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: 0.8 }}
-              >
-                <Link
-                  to="/get-started"
-                  className="px-5 py-2 rounded-full bg-green text-foreground shadow-sm hover:shadow-md hover:bg-green/90 transition-all duration-200"
-                >
-                  Get Started
-                </Link>
-              </motion.div>
+              {isAuthenticated ? (
+                <UserProfileButton />
+              ) : (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: 0.7 }}
+                  >
+                    <Link
+                      to="/login"
+                      className="px-5 py-2 rounded-full border-2 border-lilac text-foreground hover:bg-lilac/10 transition-all duration-200"
+                    >
+                      Login
+                    </Link>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: 0.8 }}
+                  >
+                    <Link
+                      to="/get-started"
+                      className="px-5 py-2 rounded-full bg-green text-foreground shadow-sm hover:shadow-md hover:bg-green/90 transition-all duration-200"
+                    >
+                      Get Started
+                    </Link>
+                  </motion.div>
+                </>
+              )}
             </div>
           </div>
 
@@ -140,20 +149,32 @@ const Header = () => {
                 </Link>
               ))}
               <div className="flex flex-col space-y-3 pt-2">
-                <Link
-                  to="/login"
-                  className="py-2 px-4 text-center rounded-full border-2 border-lilac text-foreground hover:bg-lilac/10 transition-all duration-200"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/get-started"
-                  className="py-2 px-4 text-center rounded-full bg-green text-foreground shadow-sm hover:shadow-md hover:bg-green/90 transition-all duration-200"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Get Started
-                </Link>
+                {isAuthenticated ? (
+                  <Link
+                    to="/profile"
+                    className="py-2 px-4 text-center rounded-full border-2 border-green text-foreground hover:bg-green/10 transition-all duration-200"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    My Profile
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      className="py-2 px-4 text-center rounded-full border-2 border-lilac text-foreground hover:bg-lilac/10 transition-all duration-200"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      to="/get-started"
+                      className="py-2 px-4 text-center rounded-full bg-green text-foreground shadow-sm hover:shadow-md hover:bg-green/90 transition-all duration-200"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Get Started
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </div>

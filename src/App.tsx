@@ -9,6 +9,7 @@ import { useLocation } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { Provider } from "react-redux";
 import { store } from "@/store";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 // Layout
 import Layout from "./components/layout/Layout";
@@ -26,6 +27,7 @@ const Register = lazy(() => import("./pages/Register"));
 const GetStarted = lazy(() => import("./pages/GetStarted"));
 const ArticleDetail = lazy(() => import("./pages/ArticleDetail"));
 const Session = lazy(() => import("./pages/Session"));
+const Profile = lazy(() => import("./pages/Profile"));
 
 const queryClient = new QueryClient();
 
@@ -82,6 +84,11 @@ const AnimatedRoutes = () => {
               <GetStarted />
             </Suspense>
           } />
+          <Route path="profile" element={
+            <Suspense fallback={<div className="w-full h-screen flex items-center justify-center"><div className="animate-pulse-gentle text-lilac">Loading...</div></div>}>
+              <Profile />
+            </Suspense>
+          } />
           <Route path="/articles/:id" element={<ArticleDetail />} />
           <Route path="*" element={<NotFound />} />
         </Route>
@@ -93,13 +100,15 @@ const AnimatedRoutes = () => {
 const App = () => (
   <Provider store={store}>
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AnimatedRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AnimatedRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   </Provider>
 );

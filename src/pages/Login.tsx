@@ -1,24 +1,39 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Lock, User, ArrowRight } from "lucide-react";
+import { Mail, Lock, ArrowRight } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Login attempt with:", { email, password });
+    try {
+      await login(email, password);
+      toast({
+        title: "Login successful",
+        description: "Welcome back to HealerNest!",
+      });
+      navigate("/profile");
+    } catch (error) {
+      toast({
+        title: "Login failed",
+        description: "Please check your credentials and try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-      // Normally would redirect after successful login
-    }, 1500);
+    }
   };
 
   return (
