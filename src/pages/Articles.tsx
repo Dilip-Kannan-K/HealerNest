@@ -1,10 +1,15 @@
+
 import { motion } from "framer-motion";
 import { Search, Heart } from "lucide-react";
 import { FeaturedArticles } from "@/components/articles/FeaturedArticles";
 import { RecentArticles } from "@/components/articles/RecentArticles";
 import { EMagazinePromo } from "@/components/articles/EMagazinePromo";
+import { useState } from "react";
 
 const Articles = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  
   const featuredArticles = [
     {
       id: 1,
@@ -75,6 +80,27 @@ const Articles = () => {
     "Parenting", "Trauma Recovery", "Self-Care"
   ];
 
+  // Filter featured articles by category and search term
+  const filteredFeaturedArticles = featuredArticles.filter(article => {
+    const matchesCategory = !selectedCategory || article.category === selectedCategory;
+    const matchesSearch = !searchTerm || 
+      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      article.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  // Filter recent articles by category and search term
+  const filteredRecentArticles = recentArticles.filter(article => {
+    const matchesCategory = !selectedCategory || article.category === selectedCategory;
+    const matchesSearch = !searchTerm || 
+      article.title.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  const handleCategoryClick = (category: string) => {
+    setSelectedCategory(prevCategory => prevCategory === category ? null : category);
+  };
+
   return (
     <div className="pt-32 pb-16">
       <div className="container mx-auto px-6 md:px-12">
@@ -101,6 +127,8 @@ const Articles = () => {
               type="text"
               placeholder="Search articles..."
               className="healer-input pl-12 pr-4 py-4 w-full rounded-full shadow-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-foreground/40" />
@@ -110,10 +138,15 @@ const Articles = () => {
             {categories.map((category, index) => (
               <motion.button
                 key={category}
-                className="px-4 py-1 bg-white/70 backdrop-blur-sm border border-lilac/20 rounded-full text-sm hover:bg-lilac/10 transition-colors duration-200"
+                className={`px-4 py-1 rounded-full text-sm transition-colors duration-200 ${
+                  selectedCategory === category 
+                    ? 'bg-lilac/20 border border-lilac text-lilac' 
+                    : 'bg-white/70 backdrop-blur-sm border border-lilac/20 hover:bg-lilac/10'
+                }`}
                 initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                animate={{ opacity:, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
+                onClick={() => handleCategoryClick(category)}
               >
                 {category}
               </motion.button>
@@ -121,10 +154,20 @@ const Articles = () => {
           </div>
         </motion.div>
 
-        <FeaturedArticles articles={featuredArticles} />
+        {filteredFeaturedArticles.length > 0 ? (
+          <FeaturedArticles articles={filteredFeaturedArticles} />
+        ) : (
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <p className="text-lg text-foreground/70">No featured articles match your criteria.</p>
+          </motion.div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-          <RecentArticles articles={recentArticles} />
+          <RecentArticles articles={filteredRecentArticles} />
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}

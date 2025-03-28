@@ -1,6 +1,24 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+interface Therapist {
+  id: string;
+  name: string;
+  specialty: string;
+  avatar: string;
+}
+
+interface SessionRequest {
+  id: string;
+  therapist: Therapist;
+  type: 'chat' | 'video' | 'inperson';
+  focusArea: string;
+  date: string;
+  time: string;
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  createdAt: string;
+}
+
 interface User {
   id: string;
   name: string;
@@ -17,6 +35,7 @@ interface User {
       avatar: string;
     };
   };
+  sessionRequests?: SessionRequest[];
 }
 
 interface AuthContextType {
@@ -25,6 +44,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
+  addSessionRequest: (request: Omit<SessionRequest, 'id' | 'createdAt' | 'status'>) => void;
+  getSessionRequests: () => SessionRequest[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -69,7 +90,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           specialty: "Cognitive Behavioral Therapy",
           avatar: "https://randomuser.me/api/portraits/women/68.jpg"
         }
-      }
+      },
+      sessionRequests: []
     };
     
     // Store in localStorage for persistence
@@ -83,12 +105,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
+  // Add a new session request to the user's profile
+  const addSessionRequest = (request: Omit<SessionRequest, 'id' | 'createdAt' | 'status'>) => {
+    if (!user) return;
+
+    const newRequest: SessionRequest = {
+      ...request,
+      id: `request-${Date.now()}`,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+
+    const updatedUser = {
+      ...user,
+      sessionRequests: [...(user.sessionRequests || []), newRequest]
+    };
+
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+  };
+
+  // Get all session requests
+  const getSessionRequests = (): SessionRequest[] => {
+    return user?.sessionRequests || [];
+  };
+
   const value = {
     user,
     isLoading,
     login,
     logout,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
+    addSessionRequest,
+    getSessionRequests
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
