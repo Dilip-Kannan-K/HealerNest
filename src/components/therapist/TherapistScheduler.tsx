@@ -1,74 +1,44 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useAppSelector, useAppDispatch } from '@/hooks';
+import { Calendar as CalendarIcon, Clock, X, Check } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '@/hooks';
 import { setSchedulerOpen } from '@/store/therapistSlice';
 import { setSessionType, setTherapyType, setSelectedDate, setSelectedTime } from '@/store/sessionSlice';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { MessageCircle, Video, User, Clock } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface TherapistSchedulerProps {
-  onSubmit?: () => void;
+  onSubmit: () => void;
 }
 
 const TherapistScheduler: React.FC<TherapistSchedulerProps> = ({ onSubmit }) => {
   const dispatch = useAppDispatch();
-  const { selectedTherapist, isSchedulerOpen } = useAppSelector(state => state.therapist);
-  const { sessionType, therapyType, selectedDate, selectedTime } = useAppSelector(state => state.session);
+  const { selectedTherapist } = useAppSelector(state => state.therapist);
   
-  const [currentStep, setCurrentStep] = useState(1);
-  
-  if (!isSchedulerOpen) return null;
+  const [sessionType, setLocalSessionType] = useState<'chat' | 'video' | 'inperson'>('video');
+  const [therapyType, setLocalTherapyType] = useState<'individual' | 'couples' | 'family'>('individual');
+  const [notes, setNotes] = useState('');
   
   const handleCloseScheduler = () => {
     dispatch(setSchedulerOpen(false));
   };
-  
-  const handleSessionTypeSelect = (type: 'chat' | 'video' | 'inperson') => {
-    dispatch(setSessionType(type));
-    setCurrentStep(2);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Store session details in Redux
+    dispatch(setSessionType(sessionType));
+    dispatch(setTherapyType(therapyType));
+    
+    // In this simplified version, we don't collect date/time from the user
+    // Instead, set placeholder values and let the therapist determine these
+    dispatch(setSelectedDate('To be determined'));
+    dispatch(setSelectedTime('To be determined'));
+    
+    // Call the onSubmit callback to handle success and closure
+    onSubmit();
   };
-  
-  const handleTherapyTypeSelect = (type: string) => {
-    dispatch(setTherapyType(type));
-    setCurrentStep(3);
-  };
-  
-  const handleDateSelect = (date: Date | undefined) => {
-    if (date) {
-      dispatch(setSelectedDate(date.toISOString()));
-      setCurrentStep(4);
-    }
-  };
-  
-  const handleTimeSelect = (time: string) => {
-    dispatch(setSelectedTime(time));
-    setCurrentStep(5);
-  };
-  
-  const handleSubmit = () => {
-    if (onSubmit) {
-      onSubmit();
-    } else {
-      dispatch(setSchedulerOpen(false));
-    }
-  };
-  
-  // Available time slots
-  const timeSlots = [
-    '9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', 
-    '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'
-  ];
-  
-  // Therapy types
-  const therapyTypes = [
-    'Anxiety', 'Depression', 'Stress Management', 
-    'Relationships', 'Self-Esteem', 'Trauma', 'Grief',
-    'Life Transitions'
-  ];
-  
+
   return (
     <motion.div
       className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-50 flex items-center justify-center p-4"
@@ -83,231 +53,119 @@ const TherapistScheduler: React.FC<TherapistSchedulerProps> = ({ onSubmit }) => 
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ type: "spring", duration: 0.5 }}
       >
-        <div className="p-6">
+        <div className="p-6 md:p-8">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">Request a Session</h2>
             <button 
-              className="p-2 rounded-full hover:bg-foreground/10 transition-colors"
+              className="p-2 rounded-full hover:bg-foreground/5"
               onClick={handleCloseScheduler}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
+              <X className="w-5 h-5" />
             </button>
           </div>
           
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex space-x-2">
-                {[1, 2, 3, 4, 5].map(step => (
-                  <div 
-                    key={step}
-                    className={`w-8 h-8 rounded-full flex items-center justify-center font-medium ${
-                      currentStep === step 
-                        ? 'bg-green text-white' 
-                        : currentStep > step 
-                          ? 'bg-green/20 text-green' 
-                          : 'bg-foreground/10 text-foreground/50'
-                    }`}
-                  >
-                    {step}
-                  </div>
-                ))}
+          {selectedTherapist && (
+            <div className="flex items-center mb-6 p-4 bg-foreground/5 rounded-lg">
+              <img 
+                src={selectedTherapist.image} 
+                alt={selectedTherapist.name} 
+                className="w-16 h-16 rounded-full object-cover mr-4"
+              />
+              <div>
+                <h3 className="font-semibold">{selectedTherapist.name}</h3>
+                <p className="text-foreground/70">{selectedTherapist.speciality}</p>
               </div>
-              <span className="text-sm text-foreground/50">Step {currentStep} of 5</span>
             </div>
-            
-            {/* Step 1: Session Type */}
-            {currentStep === 1 && (
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Choose Session Type</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div 
-                    className={`healer-card p-4 cursor-pointer ${sessionType === 'chat' ? 'border-green' : ''}`}
-                    onClick={() => handleSessionTypeSelect('chat')}
-                  >
-                    <div className="flex flex-col items-center text-center">
-                      <MessageCircle className="w-10 h-10 text-green mb-2" />
-                      <h4 className="font-semibold mb-1">Chat Session</h4>
-                      <p className="text-sm text-foreground/70">Text-based therapy</p>
-                      <p className="text-green font-medium mt-2">$35/session</p>
-                    </div>
-                  </div>
-                  
-                  <div 
-                    className={`healer-card p-4 cursor-pointer ${sessionType === 'video' ? 'border-green' : ''}`}
-                    onClick={() => handleSessionTypeSelect('video')}
-                  >
-                    <div className="flex flex-col items-center text-center">
-                      <Video className="w-10 h-10 text-green mb-2" />
-                      <h4 className="font-semibold mb-1">Video Session</h4>
-                      <p className="text-sm text-foreground/70">Face-to-face online</p>
-                      <p className="text-green font-medium mt-2">$65/session</p>
-                    </div>
-                  </div>
-                  
-                  <div 
-                    className={`healer-card p-4 cursor-pointer ${sessionType === 'inperson' ? 'border-green' : ''}`}
-                    onClick={() => handleSessionTypeSelect('inperson')}
-                  >
-                    <div className="flex flex-col items-center text-center">
-                      <User className="w-10 h-10 text-green mb-2" />
-                      <h4 className="font-semibold mb-1">In-Person</h4>
-                      <p className="text-sm text-foreground/70">Office visit</p>
-                      <p className="text-green font-medium mt-2">$85/session</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {/* Step 2: Therapy Type */}
-            {currentStep === 2 && (
-              <div>
-                <h3 className="text-lg font-semibold mb-4">What would you like to focus on?</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {therapyTypes.map(type => (
-                    <div 
-                      key={type} 
-                      className={`p-3 border rounded-lg text-center cursor-pointer transition-all ${
-                        therapyType === type ? 'border-green bg-green/10 text-green' : 'border-foreground/20 hover:border-green/30'
-                      }`}
-                      onClick={() => handleTherapyTypeSelect(type)}
-                    >
-                      {type}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {/* Step 3: Select Date */}
-            {currentStep === 3 && (
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Select a Date</h3>
-                <div className="flex justify-center">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate ? new Date(selectedDate) : undefined}
-                    onSelect={handleDateSelect}
-                    className="rounded-md border"
-                    disabled={(date) => {
-                      // Disable dates in the past and weekends for this example
-                      return date < new Date() || date.getDay() === 0 || date.getDay() === 6
-                    }}
-                  />
-                </div>
-              </div>
-            )}
-            
-            {/* Step 4: Select Time */}
-            {currentStep === 4 && (
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Select a Time</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {timeSlots.map(time => (
-                    <div 
-                      key={time}
-                      className={`py-3 rounded-lg text-center cursor-pointer transition-all ${
-                        selectedTime === time 
-                          ? 'bg-green/10 border border-green text-green font-medium' 
-                          : 'bg-foreground/5 hover:bg-foreground/10'
-                      }`}
-                      onClick={() => handleTimeSelect(time)}
-                    >
-                      <div className="flex items-center justify-center">
-                        <Clock className="w-4 h-4 mr-2" />
-                        {time}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {/* Step 5: Review and Submit */}
-            {currentStep === 5 && (
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Review Your Request</h3>
-                <div className="healer-card p-4 mb-6">
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-foreground/70">Therapist:</span>
-                      <span className="font-medium">{selectedTherapist?.name}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-foreground/70">Session Type:</span>
-                      <span className="font-medium capitalize">{sessionType} Session</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-foreground/70">Focus Area:</span>
-                      <span className="font-medium">{therapyType}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-foreground/70">Date:</span>
-                      <span className="font-medium">
-                        {selectedDate && new Date(selectedDate).toLocaleDateString('en-US', {
-                          weekday: 'long',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-foreground/70">Time:</span>
-                      <span className="font-medium">{selectedTime}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <p className="text-foreground/70 text-sm mb-6">
-                  By submitting this request, you're expressing interest in scheduling a session. 
-                  Our team will contact you shortly to confirm availability and provide next steps.
-                </p>
-              </div>
-            )}
-          </div>
+          )}
           
-          <div className="flex justify-between">
-            {currentStep > 1 ? (
-              <Button 
-                variant="outline"
-                onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
-              >
-                Back
-              </Button>
-            ) : (
-              <Button 
-                variant="outline"
-                onClick={handleCloseScheduler}
-              >
-                Cancel
-              </Button>
-            )}
-            
-            {currentStep < 5 ? (
-              <Button 
-                className="bg-green hover:bg-green/90 text-white"
-                disabled={
-                  (currentStep === 1 && !sessionType) ||
-                  (currentStep === 2 && !therapyType) ||
-                  (currentStep === 3 && !selectedDate) ||
-                  (currentStep === 4 && !selectedTime)
-                }
-                onClick={() => setCurrentStep(prev => Math.min(5, prev + 1))}
-              >
-                Next
-              </Button>
-            ) : (
-              <Button 
-                className="bg-green hover:bg-green/90 text-white"
-                onClick={handleSubmit}
-              >
-                Submit Request
-              </Button>
-            )}
-          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium mb-2">Session Type</label>
+                <div className="grid grid-cols-3 gap-3">
+                  <button
+                    type="button"
+                    className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center transition-colors ${
+                      sessionType === 'chat' 
+                        ? 'border-green bg-green/10' 
+                        : 'border-foreground/20 hover:border-green/50'
+                    }`}
+                    onClick={() => setLocalSessionType('chat')}
+                  >
+                    <span className="text-sm font-medium">Chat</span>
+                    <span className="text-xs text-foreground/70 mt-1">$35/session</span>
+                  </button>
+                  
+                  <button
+                    type="button"
+                    className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center transition-colors ${
+                      sessionType === 'video' 
+                        ? 'border-green bg-green/10' 
+                        : 'border-foreground/20 hover:border-green/50'
+                    }`}
+                    onClick={() => setLocalSessionType('video')}
+                  >
+                    <span className="text-sm font-medium">Video</span>
+                    <span className="text-xs text-foreground/70 mt-1">$65/session</span>
+                  </button>
+                  
+                  <button
+                    type="button"
+                    className={`p-3 rounded-lg border text-center flex flex-col items-center justify-center transition-colors ${
+                      sessionType === 'inperson' 
+                        ? 'border-green bg-green/10' 
+                        : 'border-foreground/20 hover:border-green/50'
+                    }`}
+                    onClick={() => setLocalSessionType('inperson')}
+                  >
+                    <span className="text-sm font-medium">In-Person</span>
+                    <span className="text-xs text-foreground/70 mt-1">$85/session</span>
+                  </button>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Therapy Type</label>
+                <Select
+                  value={therapyType}
+                  onValueChange={(value: 'individual' | 'couples' | 'family') => setLocalTherapyType(value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select therapy type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="individual">Individual Therapy</SelectItem>
+                    <SelectItem value="couples">Couples Therapy</SelectItem>
+                    <SelectItem value="family">Family Therapy</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Notes (optional)</label>
+                <textarea
+                  className="healer-input w-full min-h-[100px]"
+                  placeholder="Briefly describe what you'd like to discuss..."
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                ></textarea>
+              </div>
+              
+              <div className="p-4 bg-lilac/10 rounded-lg text-center">
+                <p className="text-sm font-medium">Your therapist will contact you with available time slots within 24 hours.</p>
+              </div>
+              
+              <div className="pt-4">
+                <button 
+                  type="submit"
+                  className="w-full py-3 rounded-full bg-green text-white font-medium hover:bg-green/90"
+                >
+                  <Check className="w-4 h-4 inline-block mr-2" />
+                  Request Session
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
       </motion.div>
     </motion.div>

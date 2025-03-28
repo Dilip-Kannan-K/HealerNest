@@ -1,9 +1,21 @@
 
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Heart, Users, Lightbulb, BookOpen, CalendarDays, Headphones, ChevronRight, Check } from "lucide-react";
+import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Services = () => {
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  
+  // State for subscription plan selection
+  const [selectedPlan, setSelectedPlan] = useState("basic");
+  const [selectedDuration, setSelectedDuration] = useState("1 month");
+  
   const services = [
     {
       id: 1,
@@ -124,6 +136,31 @@ const Services = () => {
       ]
     }
   ];
+  
+  // Helper function to get current pricing
+  const getCurrentPricing = () => {
+    const plan = subscriptionPlans.find(p => p.id === selectedPlan);
+    if (!plan) return null;
+    
+    return plan.pricing.find(p => p.duration === selectedDuration);
+  };
+  
+  // Handle subscription selection
+  const handleChoosePlan = () => {
+    if (isAuthenticated && user?.subscription?.status === "Active") {
+      // Show warning toast if user already has active subscription
+      toast.warning("You already have an active subscription. Please manage your subscription from your profile page.", {
+        duration: 5000,
+        action: {
+          label: "View Profile",
+          onClick: () => navigate("/profile")
+        }
+      });
+    } else {
+      // Proceed to payment or registration
+      navigate("/get-started");
+    }
+  };
 
   return (
     <div className="pt-32 pb-16">
@@ -156,10 +193,11 @@ const Services = () => {
             {subscriptionPlans.map((plan) => (
               <motion.div
                 key={plan.id}
-                className="healer-card overflow-hidden hover-lift"
+                className={`healer-card overflow-hidden hover-lift ${selectedPlan === plan.id ? 'border-2 border-green' : ''}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
+                onClick={() => setSelectedPlan(plan.id)}
               >
                 <div className="p-8">
                   <div className="bg-lilac/20 rounded-full w-fit px-4 py-2 mb-4">
@@ -179,33 +217,47 @@ const Services = () => {
                       ))}
                     </ul>
                   </div>
-                  
-                  <div className="mb-6">
-                    <h4 className="font-semibold mb-3">Choose your commitment:</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {plan.pricing.map((price, idx) => (
-                        <div key={idx} className="border border-lilac/30 rounded-lg p-4 hover:border-green/50 transition-all duration-300">
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="font-medium">{price.duration}</span>
-                            {price.discount && (
-                              <span className="bg-green/10 text-green text-xs px-2 py-1 rounded-full">Save {price.discount}</span>
-                            )}
-                          </div>
-                          <div className="text-xl font-bold text-green">{price.price}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <Link 
-                    to="/get-started" 
-                    className="block w-full py-3 text-center rounded-full bg-green text-foreground font-medium hover:bg-green/90 transition-all duration-300"
-                  >
-                    Choose This Plan
-                  </Link>
                 </div>
               </motion.div>
             ))}
+          </div>
+          
+          {/* Duration selection and plan selection button */}
+          <div className="max-w-md mx-auto">
+            <div className="mb-6">
+              <label className="block text-sm font-medium mb-2">Choose your commitment:</label>
+              <Select
+                value={selectedDuration}
+                onValueChange={setSelectedDuration}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select duration" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1 month">1 month</SelectItem>
+                  <SelectItem value="3 months">3 months (Save 5-6%)</SelectItem>
+                  <SelectItem value="6 months">6 months (Save 10-11%)</SelectItem>
+                  <SelectItem value="Annual">Annual (Save 15-17%)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="mb-6 p-4 bg-green/10 rounded-lg text-center">
+              <p className="text-lg font-bold text-green">
+                {getCurrentPricing()?.price}
+                <span className="text-sm font-normal text-foreground/70"> for {selectedDuration}</span>
+              </p>
+              {getCurrentPricing()?.discount && (
+                <p className="text-sm text-green mt-1">You save {getCurrentPricing()?.discount}</p>
+              )}
+            </div>
+            
+            <Button 
+              className="w-full bg-green hover:bg-green/90 text-white font-medium py-6"
+              onClick={handleChoosePlan}
+            >
+              Choose This Plan
+            </Button>
           </div>
         </motion.div>
 

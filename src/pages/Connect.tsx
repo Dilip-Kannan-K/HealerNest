@@ -9,7 +9,7 @@ import SessionTypes from "@/components/connect/SessionTypes";
 import CommunicationPlatform from "@/components/connect/CommunicationPlatform";
 import TherapistList from "@/components/connect/TherapistList";
 import WebinarSessions from "@/components/connect/WebinarSessions";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { setSchedulerOpen } from "@/store/therapistSlice";
 import { Button } from "@/components/ui/button";
 import { User, Calendar } from "lucide-react";
@@ -18,16 +18,35 @@ import { toast } from "sonner";
 
 const Connect = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { selectedTherapist, isSchedulerOpen } = useAppSelector(state => state.therapist);
   const { sessionType, therapyType, selectedDate, selectedTime } = useAppSelector(state => state.session);
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, addSessionRequest } = useAuth();
   
   // Handler for requesting a session
   const handleRequestSession = () => {
-    if (isAuthenticated) {
+    if (isAuthenticated && selectedTherapist) {
+      // Add the session request to the user's profile
+      addSessionRequest({
+        therapist: {
+          id: selectedTherapist.id,
+          name: selectedTherapist.name,
+          specialty: selectedTherapist.speciality,
+          avatar: selectedTherapist.image
+        },
+        type: sessionType || 'video',
+        focusArea: therapyType || 'individual',
+        date: 'To be determined',
+        time: 'To be determined'
+      });
+      
       // Show success message
-      toast.success("Your session request has been submitted! We'll contact you soon to confirm.", {
+      toast.success("Your session request has been submitted! We'll contact you within 24 hours to confirm the details.", {
         duration: 5000,
+        action: {
+          label: "View Profile",
+          onClick: () => navigate("/profile")
+        }
       });
       
       // Reset scheduler state
@@ -40,7 +59,7 @@ const Connect = () => {
         duration: 3000,
         action: {
           label: "Log in",
-          onClick: () => window.location.href = "/login"
+          onClick: () => navigate("/login")
         }
       });
     }

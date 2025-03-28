@@ -57,8 +57,16 @@ const mockOrders = [
 ];
 
 const Profile = () => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, getSessionRequests } = useAuth();
   const [orders, setOrders] = useState(mockOrders);
+  const [sessionRequests, setSessionRequests] = useState([]);
+
+  // Get session requests when component mounts
+  useEffect(() => {
+    if (user) {
+      setSessionRequests(getSessionRequests());
+    }
+  }, [user, getSessionRequests]);
 
   if (isLoading) {
     return (
@@ -205,6 +213,76 @@ const Profile = () => {
                       <p className="text-foreground/70 mb-4">Explore our healing plans to find the perfect match for your journey</p>
                       <Button asChild>
                         <Link to="/services">View Plans</Link>
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Session Requests - New Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.25 }}
+              className="lg:col-span-3"
+            >
+              <Card>
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle className="text-xl">Session Requests</CardTitle>
+                      <CardDescription>Pending and upcoming sessions</CardDescription>
+                    </div>
+                    <Button size="sm" className="bg-green hover:bg-green/90 text-white" asChild>
+                      <Link to="/connect">Request New Session</Link>
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  {sessionRequests && sessionRequests.length > 0 ? (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Therapist</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Focus Area</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Requested on</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {sessionRequests.map((request: any) => (
+                          <TableRow key={request.id}>
+                            <TableCell className="font-medium">
+                              <div className="flex items-center">
+                                <Avatar className="h-8 w-8 mr-2">
+                                  <AvatarImage src={request.therapist.avatar} />
+                                  <AvatarFallback className="bg-lilac/20">
+                                    {request.therapist.name.split(" ").map((n: string) => n[0]).join("")}
+                                  </AvatarFallback>
+                                </Avatar>
+                                {request.therapist.name}
+                              </div>
+                            </TableCell>
+                            <TableCell>{request.type.charAt(0).toUpperCase() + request.type.slice(1)}</TableCell>
+                            <TableCell>{request.focusArea.charAt(0).toUpperCase() + request.focusArea.slice(1)}</TableCell>
+                            <TableCell>
+                              <span className="px-2 py-1 bg-lilac/20 text-lilac rounded-full text-xs">
+                                {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                              </span>
+                            </TableCell>
+                            <TableCell>{new Date(request.createdAt).toLocaleDateString()}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <div className="text-center py-6">
+                      <h3 className="text-lg font-medium mb-2">No Session Requests</h3>
+                      <p className="text-foreground/70 mb-4">Request a session with one of our therapists to get started</p>
+                      <Button asChild>
+                        <Link to="/connect">Find a Therapist</Link>
                       </Button>
                     </div>
                   )}
