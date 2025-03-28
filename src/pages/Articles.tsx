@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Search, Heart } from "lucide-react";
 import { FeaturedArticles } from "@/components/articles/FeaturedArticles";
@@ -80,7 +79,6 @@ const Articles = () => {
     "Parenting", "Trauma Recovery", "Self-Care"
   ];
 
-  // Filter featured articles by category and search term
   const filteredFeaturedArticles = featuredArticles.filter(article => {
     const matchesCategory = !selectedCategory || article.category === selectedCategory;
     const matchesSearch = !searchTerm || 
@@ -89,7 +87,6 @@ const Articles = () => {
     return matchesCategory && matchesSearch;
   });
 
-  // Filter recent articles by category and search term
   const filteredRecentArticles = recentArticles.filter(article => {
     const matchesCategory = !selectedCategory || article.category === selectedCategory;
     const matchesSearch = !searchTerm || 
@@ -144,7 +141,7 @@ const Articles = () => {
                     : 'bg-white/70 backdrop-blur-sm border border-lilac/20 hover:bg-lilac/10'
                 }`}
                 initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity:, y: 0 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
                 onClick={() => handleCategoryClick(category)}
               >
