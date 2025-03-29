@@ -4,9 +4,14 @@ import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import WebinarCard, { WebinarData } from "./WebinarCard";
 import WebinarFilter from "./WebinarFilter";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const WebinarSessions = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const { isAuthenticated, bookWebinar } = useAuth();
+  const navigate = useNavigate();
 
   const webinars: WebinarData[] = [
     {
@@ -83,7 +88,41 @@ const WebinarSessions = () => {
 
   const handleRegister = (webinarId: number) => {
     console.log(`Registered for webinar ID: ${webinarId}`);
-    // In a real app, you would handle the registration process here
+    
+    if (!isAuthenticated) {
+      toast.error("Please log in to register for webinars", {
+        duration: 3000,
+        action: {
+          label: "Log in",
+          onClick: () => navigate("/login")
+        }
+      });
+      return;
+    }
+    
+    // Find the webinar data
+    const webinar = webinars.find(w => w.id === webinarId);
+    if (!webinar) return;
+    
+    // Add the webinar to the user's profile
+    bookWebinar({
+      title: webinar.title,
+      date: webinar.date,
+      time: webinar.time,
+      host: {
+        name: webinar.speaker,
+        avatar: "https://randomuser.me/api/portraits/women/28.jpg" // Default avatar
+      }
+    });
+    
+    // Show success message
+    toast.success("You have successfully registered for the webinar!", {
+      duration: 5000,
+      action: {
+        label: "View Profile",
+        onClick: () => navigate("/profile")
+      }
+    });
   };
 
   return (
