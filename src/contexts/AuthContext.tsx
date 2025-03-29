@@ -8,6 +8,18 @@ interface Therapist {
   avatar: string;
 }
 
+interface WebinarSession {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  host: {
+    name: string;
+    avatar: string;
+  };
+  status: 'upcoming' | 'completed' | 'cancelled';
+}
+
 interface SessionRequest {
   id: string;
   therapist: Therapist;
@@ -28,12 +40,7 @@ interface User {
     plan: string;
     status: string;
     nextBilling?: string;
-    therapist?: {
-      id: string;
-      name: string;
-      specialty: string;
-      avatar: string;
-    };
+    webinarSessions?: WebinarSession[];
   };
   sessionRequests?: SessionRequest[];
 }
@@ -46,6 +53,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   addSessionRequest: (request: Omit<SessionRequest, 'id' | 'createdAt' | 'status'>) => void;
   getSessionRequests: () => SessionRequest[];
+  bookWebinar: (webinar: Omit<WebinarSession, 'id' | 'status'>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -84,12 +92,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         plan: "Premium Healing",
         status: "Active",
         nextBilling: "2023-12-01",
-        therapist: {
-          id: "therapist456",
-          name: "Dr. Emily Wilson",
-          specialty: "Cognitive Behavioral Therapy",
-          avatar: "https://randomuser.me/api/portraits/women/68.jpg"
-        }
+        webinarSessions: [
+          {
+            id: "webinar-1",
+            title: "Mindfulness Meditation",
+            date: "2023-11-15",
+            time: "10:00 AM",
+            host: {
+              name: "Dr. Sarah Johnson",
+              avatar: "https://randomuser.me/api/portraits/women/28.jpg"
+            },
+            status: "upcoming"
+          }
+        ]
       },
       sessionRequests: []
     };
@@ -125,6 +140,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem("user", JSON.stringify(updatedUser));
   };
 
+  // Book a webinar session
+  const bookWebinar = (webinar: Omit<WebinarSession, 'id' | 'status'>) => {
+    if (!user || !user.subscription) return;
+
+    const newWebinar: WebinarSession = {
+      ...webinar,
+      id: `webinar-${Date.now()}`,
+      status: 'upcoming'
+    };
+
+    const updatedUser = {
+      ...user,
+      subscription: {
+        ...user.subscription,
+        webinarSessions: [...(user.subscription.webinarSessions || []), newWebinar]
+      }
+    };
+
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+  };
+
   // Get all session requests
   const getSessionRequests = (): SessionRequest[] => {
     return user?.sessionRequests || [];
@@ -137,7 +174,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logout,
     isAuthenticated: !!user,
     addSessionRequest,
-    getSessionRequests
+    getSessionRequests,
+    bookWebinar
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

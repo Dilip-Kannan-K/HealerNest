@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -31,6 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const mockOrders = [
   {
@@ -186,33 +188,55 @@ const Profile = () => {
                         </div>
                       </div>
                       
-                      {user.subscription.therapist && (
-                        <div className="pt-4 border-t border-border">
-                          <h4 className="text-sm font-medium mb-3">Your Therapist</h4>
-                          <div className="flex items-center space-x-3">
-                            <Avatar>
-                              <AvatarImage src={user.subscription.therapist.avatar} alt={user.subscription.therapist.name} />
-                              <AvatarFallback className="bg-lilac/20">
-                                {user.subscription.therapist.name.split(" ").map(name => name[0]).join("").toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-medium">{user.subscription.therapist.name}</p>
-                              <p className="text-sm text-foreground/70">{user.subscription.therapist.specialty}</p>
+                      <div className="pt-4 border-t border-border">
+                        <h4 className="text-sm font-medium mb-3">Your Webinar Sessions</h4>
+                        {user.subscription.webinarSessions && user.subscription.webinarSessions.length > 0 ? (
+                          <ScrollArea className="h-[200px] pr-4">
+                            <div className="space-y-4">
+                              {user.subscription.webinarSessions.map((webinar) => (
+                                <div key={webinar.id} className="flex items-start space-x-3 p-3 rounded-md bg-foreground/5">
+                                  <Avatar>
+                                    <AvatarImage src={webinar.host.avatar} alt={webinar.host.name} />
+                                    <AvatarFallback className="bg-lilac/20">
+                                      {webinar.host.name.split(" ").map(name => name[0]).join("").toUpperCase()}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div className="flex-1">
+                                    <div className="flex justify-between">
+                                      <h5 className="font-medium">{webinar.title}</h5>
+                                      <span className="px-2 py-1 bg-green/20 text-green rounded-full text-xs">
+                                        {webinar.status}
+                                      </span>
+                                    </div>
+                                    <p className="text-sm text-foreground/70">Host: {webinar.host.name}</p>
+                                    <div className="flex items-center text-xs text-foreground/70 mt-1">
+                                      <Calendar className="w-3 h-3 mr-1" />
+                                      {webinar.date} 
+                                      <Clock className="w-3 h-3 ml-2 mr-1" />
+                                      {webinar.time}
+                                    </div>
+                                    <div className="mt-2 flex gap-2">
+                                      <Button size="sm" variant="outline" className="h-8 text-xs">
+                                        Join Session
+                                      </Button>
+                                      <Button size="sm" variant="outline" className="h-8 text-xs">
+                                        Add to Calendar
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                          </div>
-                          <div className="mt-4 flex flex-wrap gap-2">
-                            <Button size="sm" className="flex items-center gap-2" onClick={() => startSession(user.subscription.therapist.id, 'chat')}>
-                              <MessageSquare className="w-4 h-4" />
-                              Chat Session
-                            </Button>
-                            <Button size="sm" variant="outline" className="flex items-center gap-2" onClick={() => startSession(user.subscription.therapist.id, 'video')}>
-                              <Video className="w-4 h-4" />
-                              Video Session
+                          </ScrollArea>
+                        ) : (
+                          <div className="text-center py-4 bg-foreground/5 rounded-md">
+                            <p className="text-foreground/70 mb-2">No webinar sessions booked</p>
+                            <Button asChild size="sm">
+                              <Link to="/connect">Browse Webinars</Link>
                             </Button>
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   ) : (
                     <div className="text-center py-6">
