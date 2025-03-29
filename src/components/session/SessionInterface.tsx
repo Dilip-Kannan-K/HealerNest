@@ -50,7 +50,7 @@ const SessionInterface: React.FC = () => {
   // Set default values for display
   const sessionDetails = {
     type: currentSessionType,
-    therapyType: 'individual',
+    therapyType: 'individual' as 'individual' | 'couples' | 'family', // Fix the type issue here
     selectedDate: 'Scheduled by therapist',
     selectedTime: 'To be determined'
   };
