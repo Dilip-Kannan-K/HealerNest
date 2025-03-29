@@ -1,8 +1,7 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   Card, 
   CardContent, 
@@ -19,7 +18,9 @@ import {
   ShoppingBag, 
   ChevronRight, 
   Star,
-  CreditCard
+  CreditCard,
+  MessageSquare,
+  Video
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,7 +32,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// Mock order history data
 const mockOrders = [
   {
     id: "ord-001",
@@ -58,15 +58,19 @@ const mockOrders = [
 
 const Profile = () => {
   const { user, isLoading, getSessionRequests } = useAuth();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState(mockOrders);
   const [sessionRequests, setSessionRequests] = useState([]);
 
-  // Get session requests when component mounts
   useEffect(() => {
     if (user) {
       setSessionRequests(getSessionRequests());
     }
   }, [user, getSessionRequests]);
+
+  const startSession = (therapistId: string, type: 'chat' | 'video') => {
+    navigate(`/session/${therapistId}/${type}`);
+  };
 
   if (isLoading) {
     return (
@@ -102,7 +106,6 @@ const Profile = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* User Information */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -154,7 +157,6 @@ const Profile = () => {
               </Card>
             </motion.div>
 
-            {/* Subscription Information */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -199,9 +201,14 @@ const Profile = () => {
                               <p className="text-sm text-foreground/70">{user.subscription.therapist.specialty}</p>
                             </div>
                           </div>
-                          <div className="mt-4">
-                            <Button size="sm" asChild>
-                              <Link to="/session">Schedule Session</Link>
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            <Button size="sm" className="flex items-center gap-2" onClick={() => startSession(user.subscription.therapist.id, 'chat')}>
+                              <MessageSquare className="w-4 h-4" />
+                              Chat Session
+                            </Button>
+                            <Button size="sm" variant="outline" className="flex items-center gap-2" onClick={() => startSession(user.subscription.therapist.id, 'video')}>
+                              <Video className="w-4 h-4" />
+                              Video Session
                             </Button>
                           </div>
                         </div>
@@ -220,7 +227,6 @@ const Profile = () => {
               </Card>
             </motion.div>
 
-            {/* Session Requests - New Section */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -249,6 +255,7 @@ const Profile = () => {
                           <TableHead>Focus Area</TableHead>
                           <TableHead>Status</TableHead>
                           <TableHead>Requested on</TableHead>
+                          <TableHead>Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -273,6 +280,20 @@ const Profile = () => {
                               </span>
                             </TableCell>
                             <TableCell>{new Date(request.createdAt).toLocaleDateString()}</TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button size="sm" variant="outline" className="flex items-center gap-1 h-8 text-xs" 
+                                  onClick={() => startSession(request.therapist.id, 'chat')}>
+                                  <MessageSquare className="w-3 h-3" />
+                                  Chat
+                                </Button>
+                                <Button size="sm" variant="outline" className="flex items-center gap-1 h-8 text-xs"
+                                  onClick={() => startSession(request.therapist.id, 'video')}>
+                                  <Video className="w-3 h-3" />
+                                  Video
+                                </Button>
+                              </div>
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -290,7 +311,6 @@ const Profile = () => {
               </Card>
             </motion.div>
 
-            {/* Order History */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}

@@ -29,7 +29,7 @@ const Connect = () => {
       // Add the session request to the user's profile
       addSessionRequest({
         therapist: {
-          id: selectedTherapist.id,
+          id: selectedTherapist.id.toString(), // Convert number to string
           name: selectedTherapist.name,
           specialty: selectedTherapist.speciality,
           avatar: selectedTherapist.image

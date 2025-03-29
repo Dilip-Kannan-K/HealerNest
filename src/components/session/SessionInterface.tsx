@@ -1,35 +1,58 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '@/hooks';
-import { Clock, Calendar, Video, ArrowLeft, Lock } from 'lucide-react';
+import { Clock, Calendar, Video, ArrowLeft, Lock, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import TherapistSummary from './TherapistSummary';
 import ChatInterface from './ChatInterface';
 import VideoCall from './VideoCall';
 import { toast } from "sonner";
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const SessionInterface: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'chat' | 'video'>('chat');
   const [isSubscribed, setIsSubscribed] = useState<boolean>(true); // Default to true for demo
   const { selectedTherapist } = useAppSelector(state => state.therapist);
-  const { sessionType, therapyType, selectedDate, selectedTime } = useAppSelector(state => state.session);
+  const { sessionType } = useAppSelector(state => state.session);
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   useEffect(() => {
-    if (!selectedTherapist || !sessionType || !selectedDate || !selectedTime) {
-      toast.error("Missing session information");
+    if (!selectedTherapist) {
+      toast.error("Please select a therapist first");
       navigate('/connect');
     }
-  }, [selectedTherapist, sessionType, selectedDate, selectedTime, navigate]);
+  }, [selectedTherapist, navigate]);
 
-  // If we don't have required data and the above useEffect hasn't redirected yet
-  if (!selectedTherapist || !sessionType || !selectedDate || !selectedTime) {
-    return null;
+  // If we don't have a therapist, show a fallback UI
+  if (!selectedTherapist) {
+    return (
+      <div className="container mx-auto px-4 py-8 mt-20 text-center">
+        <h2 className="text-2xl font-bold mb-4">No therapist selected</h2>
+        <p className="mb-8">Please select a therapist to start a session.</p>
+        <Button onClick={() => navigate('/connect')}>
+          Browse Therapists
+        </Button>
+      </div>
+    );
   }
 
   const handleSubscribe = () => {
     setIsSubscribed(true);
     toast.success("You've subscribed to this therapist!");
+  };
+
+  // Set default session type if none is selected
+  const currentSessionType = sessionType || 'chat';
+
+  // Set default values for display
+  const sessionDetails = {
+    type: currentSessionType,
+    therapyType: 'individual',
+    selectedDate: 'Scheduled by therapist',
+    selectedTime: 'To be determined'
   };
 
   return (
@@ -49,10 +72,10 @@ const SessionInterface: React.FC = () => {
         <div className="lg:col-span-1">
           <TherapistSummary 
             therapist={selectedTherapist} 
-            sessionType={sessionType}
-            therapyType={therapyType}
-            selectedDate={selectedDate}
-            selectedTime={selectedTime}
+            sessionType={sessionDetails.type}
+            therapyType={sessionDetails.therapyType}
+            selectedDate={sessionDetails.selectedDate}
+            selectedTime={sessionDetails.selectedTime}
             isSubscribed={isSubscribed}
             onSubscribe={handleSubscribe}
           />
@@ -67,7 +90,7 @@ const SessionInterface: React.FC = () => {
               </div>
               <h3 className="text-2xl font-semibold mb-3">Session Locked</h3>
               <p className="text-foreground/70 mb-6 max-w-md">
-                You need to subscribe to this therapist to access the {sessionType} session.
+                You need to subscribe to this therapist to access the {currentSessionType} session.
               </p>
               <button 
                 onClick={handleSubscribe}

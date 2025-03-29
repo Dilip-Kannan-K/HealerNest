@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -64,11 +63,8 @@ const AnimatedRoutes = () => {
               <Connect />
             </Suspense>
           } />
-          <Route path="session" element={
-            <Suspense fallback={<div className="w-full h-screen flex items-center justify-center"><div className="animate-pulse-gentle text-lilac">Loading...</div></div>}>
-              <Session />
-            </Suspense>
-          } />
+          <Route path="session" element={<Session />} />
+          <Route path="/session/:therapistId/:sessionType" element={<Session />} />
           <Route path="login" element={
             <Suspense fallback={<div className="w-full h-screen flex items-center justify-center"><div className="animate-pulse-gentle text-lilac">Loading...</div></div>}>
               <Login />
