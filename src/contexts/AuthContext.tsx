@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface Therapist {
@@ -36,6 +35,9 @@ interface User {
   name: string;
   email: string;
   avatar?: string;
+  gender?: string;
+  age?: number;
+  memberSince: string;
   subscription?: {
     plan: string;
     status: string;
@@ -82,12 +84,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
+    // Format current date to YYYY-MM-DD for memberSince
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0];
+    
     // Mock user data
     const mockUser: User = {
       id: "user123",
       name: "Jane Doe",
       email: email,
       avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+      gender: "Female",
+      age: 32,
+      memberSince: formattedDate,
       subscription: {
         plan: "Premium Healing",
         status: "Active",

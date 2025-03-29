@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
-  User, 
+  User as UserIcon, 
   Calendar, 
   Clock, 
   ShoppingBag, 
@@ -21,7 +20,8 @@ import {
   Star,
   CreditCard,
   MessageSquare,
-  Video
+  Video,
+  UserRound
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -135,17 +135,24 @@ const Profile = () => {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center text-sm">
                       <span className="flex items-center text-foreground/70">
-                        <User className="w-4 h-4 mr-2" />
+                        <UserIcon className="w-4 h-4 mr-2" />
                         Member since
                       </span>
-                      <span>January 2023</span>
+                      <span>{user.memberSince}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="flex items-center text-foreground/70">
+                        <UserRound className="w-4 h-4 mr-2" />
+                        Gender
+                      </span>
+                      <span>{user.gender || 'Not specified'}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
                       <span className="flex items-center text-foreground/70">
                         <Calendar className="w-4 h-4 mr-2" />
-                        Last session
+                        Age
                       </span>
-                      <span>Oct 15, 2023</span>
+                      <span>{user.age || 'Not specified'}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -198,7 +205,7 @@ const Profile = () => {
                                   <Avatar>
                                     <AvatarImage src={webinar.host.avatar} alt={webinar.host.name} />
                                     <AvatarFallback className="bg-lilac/20">
-                                      {webinar.host.name.split(" ").map(name => name[0]).join("").toUpperCase()}
+                                      {webinar.host.name.split(" ").map((n: string) => n[0]).join("")}
                                     </AvatarFallback>
                                   </Avatar>
                                   <div className="flex-1">
