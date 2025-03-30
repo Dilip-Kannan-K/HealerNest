@@ -1,8 +1,24 @@
 
 import { motion } from "framer-motion";
 import { Star as StarIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const EMagazinePromo = () => {
+  const navigate = useNavigate();
+
+  const handleSubscribe = () => {
+    const subscription = {
+      type: 'subscription',
+      title: 'Premium E-Magazine Subscription',
+      price: 4.99,
+      duration: 'Monthly',
+      description: 'Monthly curated content from top mental health professionals, downloadable worksheets and resources, and an ad-free reading experience.',
+      image: 'https://images.unsplash.com/photo-1585828922344-85c9daa264b0?auto=format&fit=crop&w=400&q=80'
+    };
+
+    navigate('/checkout', { state: { item: subscription } });
+  };
+
   return (
     <motion.div
       className="bg-gradient-to-r from-lilac/30 to-green/30 rounded-xl p-8 mb-12"
@@ -34,12 +50,12 @@ export const EMagazinePromo = () => {
             </li>
           </ul>
           <div className="flex items-center gap-6">
-            <a 
-              href="#" 
+            <button 
+              onClick={handleSubscribe}
               className="primary-button"
             >
               Subscribe Now
-            </a>
+            </button>
             <span className="text-xl font-bold">$4.99/month</span>
           </div>
         </div>

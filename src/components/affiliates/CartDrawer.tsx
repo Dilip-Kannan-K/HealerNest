@@ -2,8 +2,10 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ShoppingCart, ShoppingBag, X, Plus, Minus } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useNavigate } from "react-router-dom";
 
 const CartDrawer = () => {
+  const navigate = useNavigate();
   const { 
     cartItems, 
     isCartOpen, 
@@ -12,6 +14,21 @@ const CartDrawer = () => {
     updateQuantity, 
     calculateTotal 
   } = useCart();
+
+  const handleCheckout = () => {
+    if (cartItems.length === 0) return;
+    
+    // Create an order summary item for the cart
+    const checkoutItem = {
+      type: 'product' as const,
+      title: `Cart (${cartItems.length} ${cartItems.length === 1 ? 'item' : 'items'})`,
+      price: parseFloat(calculateTotal()),
+      description: cartItems.map(item => `${item.name} (x${item.quantity})`).join(', ')
+    };
+    
+    setIsCartOpen(false);
+    navigate('/checkout', { state: { item: checkoutItem } });
+  };
 
   return (
     <>
@@ -122,7 +139,10 @@ const CartDrawer = () => {
                         <span>Total:</span>
                         <span>${calculateTotal()}</span>
                       </div>
-                      <button className="w-full py-3 bg-green text-white rounded-md font-medium">
+                      <button 
+                        className="w-full py-3 bg-green text-white rounded-md font-medium"
+                        onClick={handleCheckout}
+                      >
                         Proceed to Checkout
                       </button>
                     </div>
