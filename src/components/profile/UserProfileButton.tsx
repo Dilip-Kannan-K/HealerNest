@@ -58,7 +58,7 @@ const UserProfileButton = () => {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link to="/profile/settings" className="flex items-center cursor-pointer">
+            <Link to="/settings" className="flex items-center cursor-pointer">
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
             </Link>

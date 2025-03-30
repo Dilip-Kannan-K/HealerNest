@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface Therapist {
@@ -47,6 +48,14 @@ interface User {
   sessionRequests?: SessionRequest[];
 }
 
+interface UpdateUserData {
+  name?: string;
+  email?: string;
+  avatar?: string;
+  gender?: string;
+  age?: number;
+}
+
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
@@ -56,6 +65,7 @@ interface AuthContextType {
   addSessionRequest: (request: Omit<SessionRequest, 'id' | 'createdAt' | 'status'>) => void;
   getSessionRequests: () => SessionRequest[];
   bookWebinar: (webinar: Omit<WebinarSession, 'id' | 'status'>) => void;
+  updateUserProfile: (data: UpdateUserData) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -171,6 +181,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem("user", JSON.stringify(updatedUser));
   };
 
+  // Update user profile
+  const updateUserProfile = async (data: UpdateUserData): Promise<void> => {
+    if (!user) throw new Error("User not authenticated");
+
+    setIsLoading(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    const updatedUser = {
+      ...user,
+      ...data
+    };
+
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    setIsLoading(false);
+  };
+
   // Get all session requests
   const getSessionRequests = (): SessionRequest[] => {
     return user?.sessionRequests || [];
@@ -184,7 +213,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAuthenticated: !!user,
     addSessionRequest,
     getSessionRequests,
-    bookWebinar
+    bookWebinar,
+    updateUserProfile
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

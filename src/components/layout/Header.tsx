@@ -1,197 +1,189 @@
 
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Leaf, Menu, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, Plus, LogOut } from "lucide-react";
+import UserProfileButton from "../profile/UserProfileButton";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import UserProfileButton from "@/components/profile/UserProfileButton";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isAuthenticated, user } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const location = useLocation();
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+  
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location]);
 
+  // Track scroll position for header transparency
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setScrollPosition(window.scrollY);
     };
 
     window.addEventListener("scroll", handleScroll);
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-  const navItems = [
-    { name: "Partners", path: "/partners" },
-    { name: "Services", path: "/services" },
-    { name: "Articles", path: "/articles" },
-    { name: "Affiliates", path: "/affiliates" },
-    { name: "Connect", path: "/connect" },
-  ];
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    setIsOpen(false);
+  };
 
   return (
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isScrolled
-          ? "py-3 bg-white/80 backdrop-blur-lg shadow-sm"
-          : "py-6 bg-transparent"
+        scrollPosition > 10 || isOpen
+          ? "bg-background/95 backdrop-blur-md shadow-sm"
+          : "bg-transparent"
       }`}
     >
       <div className="container mx-auto px-6 md:px-12">
-        <div className="flex items-center justify-between">
+        <div className="flex justify-between items-center h-20">
+          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <motion.div
-              initial={{ rotate: -10 }}
-              animate={{ rotate: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Leaf className="w-8 h-8 text-green" />
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="font-bold text-2xl"
-            >
-              HealerNest
-            </motion.div>
+            <div className="h-10 w-10 bg-green rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-lg">HJ</span>
+            </div>
+            <span className="font-bold text-xl">HealingJourney</span>
           </Link>
 
-          <div className="hidden md:flex items-center space-x-8">
-            <nav className="flex items-center space-x-8">
-              {navItems.map((item, index) => (
-                <motion.div
-                  key={item.name}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.1 * index }}
-                >
-                  <Link to={item.path} className="nav-link">
-                    {item.name}
-                  </Link>
-                </motion.div>
-              ))}
-            </nav>
-            
-            <div className="flex items-center space-x-4">
-              {isAuthenticated ? (
-                <UserProfileButton />
-              ) : (
-                <>
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: 0.7 }}
-                  >
-                    <Link
-                      to="/login"
-                      className="px-5 py-2 rounded-full border-2 border-lilac text-foreground hover:bg-lilac/10 transition-all duration-200"
-                    >
-                      Login
-                    </Link>
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: 0.8 }}
-                  >
-                    <Link
-                      to="/get-started"
-                      className="px-5 py-2 rounded-full bg-green text-foreground shadow-sm hover:shadow-md hover:bg-green/90 transition-all duration-200"
-                    >
-                      Get Started
-                    </Link>
-                  </motion.div>
-                </>
-              )}
-            </div>
-          </div>
-
-          <div className="md:hidden">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 focus:outline-none"
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-8">
+            <Link
+              to="/partners"
+              className="nav-link relative text-foreground/70 hover:text-foreground transition-colors"
             >
-              {mobileMenuOpen ? (
-                <X className="w-6 h-6 text-foreground" />
+              Partners
+            </Link>
+            <Link
+              to="/services"
+              className="nav-link relative text-foreground/70 hover:text-foreground transition-colors"
+            >
+              Services
+            </Link>
+            <Link
+              to="/articles"
+              className="nav-link relative text-foreground/70 hover:text-foreground transition-colors"
+            >
+              Articles
+            </Link>
+            <Link
+              to="/affiliates"
+              className="nav-link relative text-foreground/70 hover:text-foreground transition-colors"
+            >
+              Affiliates
+            </Link>
+            <Link
+              to="/connect"
+              className="nav-link relative text-foreground/70 hover:text-foreground transition-colors"
+            >
+              Connect
+            </Link>
+          </nav>
+
+          {/* User menu / Auth buttons */}
+          <div className="flex items-center space-x-4">
+            {isAuthenticated ? (
+              <UserProfileButton />
+            ) : (
+              <div className="hidden sm:flex items-center space-x-3">
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/login">Login</Link>
+                </Button>
+                <Button asChild className="bg-green hover:bg-green/90 text-white" size="sm">
+                  <Link to="/register">
+                    <Plus className="mr-1 h-4 w-4" />
+                    Sign Up
+                  </Link>
+                </Button>
+              </div>
+            )}
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="lg:hidden text-foreground focus:outline-none"
+            >
+              {isOpen ? (
+                <X className="h-6 w-6" />
               ) : (
-                <Menu className="w-6 h-6 text-foreground" />
+                <Menu className="h-6 w-6" />
               )}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.3 }}
-          className="md:hidden bg-white/95 backdrop-blur-md shadow-md"
-        >
-          <div className="container mx-auto px-6 py-4">
-            <nav className="flex flex-col space-y-4">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className="py-2 nav-link"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <div className="flex flex-col space-y-3 pt-2">
-                {isAuthenticated ? (
-                  <Link
-                    to="/profile"
-                    className="py-2 px-4 text-center rounded-full border-2 border-green text-foreground hover:bg-green/10 transition-all duration-200"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
+      {/* Mobile Navigation */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="lg:hidden bg-background border-t"
+          >
+            <div className="container mx-auto px-6 py-6 flex flex-col space-y-4">
+              <Link to="/partners" className="py-2 text-foreground/70 hover:text-foreground transition-colors">
+                Partners
+              </Link>
+              <Link to="/services" className="py-2 text-foreground/70 hover:text-foreground transition-colors">
+                Services
+              </Link>
+              <Link to="/articles" className="py-2 text-foreground/70 hover:text-foreground transition-colors">
+                Articles
+              </Link>
+              <Link to="/affiliates" className="py-2 text-foreground/70 hover:text-foreground transition-colors">
+                Affiliates
+              </Link>
+              <Link to="/connect" className="py-2 text-foreground/70 hover:text-foreground transition-colors">
+                Connect
+              </Link>
+              
+              {isAuthenticated ? (
+                <>
+                  <Link to="/profile" className="py-2 text-foreground/70 hover:text-foreground transition-colors">
                     My Profile
                   </Link>
-                ) : (
-                  <>
-                    <Link
-                      to="/login"
-                      className="py-2 px-4 text-center rounded-full border-2 border-lilac text-foreground hover:bg-lilac/10 transition-all duration-200"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Login
+                  <Link to="/settings" className="py-2 text-foreground/70 hover:text-foreground transition-colors">
+                    Settings
+                  </Link>
+                  <button 
+                    onClick={handleLogout}
+                    className="py-2 text-destructive hover:text-destructive/80 transition-colors flex items-center"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log Out
+                  </button>
+                </>
+              ) : (
+                <div className="pt-4 flex flex-col space-y-3">
+                  <Button asChild variant="outline">
+                    <Link to="/login">Login</Link>
+                  </Button>
+                  <Button asChild className="bg-green hover:bg-green/90 text-white">
+                    <Link to="/register">
+                      <Plus className="mr-1 h-4 w-4" />
+                      Sign Up
                     </Link>
-                    <Link
-                      to="/get-started"
-                      className="py-2 px-4 text-center rounded-full bg-green text-foreground shadow-sm hover:shadow-md hover:bg-green/90 transition-all duration-200"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Get Started
-                    </Link>
-                  </>
-                )}
-              </div>
-            </nav>
-          </div>
-        </motion.div>
-      )}
-      
-      {/* Tagline */}
-      <div className="container mx-auto text-center mt-1">
-        <motion.p 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.9 }}
-          className="text-sm font-light italic text-foreground/70"
-        >
-          A safe place to learn and grow
-        </motion.p>
-      </div>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

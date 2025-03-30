@@ -104,23 +104,21 @@ const WebinarSessions = () => {
     const webinar = webinars.find(w => w.id === webinarId);
     if (!webinar) return;
     
-    // Add the webinar to the user's profile
-    bookWebinar({
-      title: webinar.title,
-      date: webinar.date,
-      time: webinar.time,
-      host: {
-        name: webinar.speaker,
-        avatar: "https://randomuser.me/api/portraits/women/28.jpg" // Default avatar
-      }
-    });
-    
-    // Show success message
-    toast.success("You have successfully registered for the webinar!", {
-      duration: 5000,
-      action: {
-        label: "View Profile",
-        onClick: () => navigate("/profile")
+    // Proceed to checkout
+    navigate("/checkout", {
+      state: {
+        item: {
+          type: 'webinar',
+          title: webinar.title,
+          price: 29.99, // Standard price for all webinars
+          description: webinar.description,
+          date: webinar.date,
+          time: webinar.time,
+          host: {
+            name: webinar.speaker,
+            avatar: "https://randomuser.me/api/portraits/women/28.jpg" // Default avatar
+          }
+        }
       }
     });
   };

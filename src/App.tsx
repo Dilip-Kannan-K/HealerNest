@@ -28,6 +28,8 @@ const GetStarted = lazy(() => import("./pages/GetStarted"));
 const ArticleDetail = lazy(() => import("./pages/ArticleDetail"));
 const Session = lazy(() => import("./pages/Session"));
 const Profile = lazy(() => import("./pages/Profile"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Checkout = lazy(() => import("./pages/Checkout"));
 
 const queryClient = new QueryClient();
 
@@ -92,6 +94,16 @@ const AnimatedRoutes = () => {
           <Route path="profile" element={
             <Suspense fallback={<div className="w-full h-screen flex items-center justify-center"><div className="animate-pulse-gentle text-lilac">Loading...</div></div>}>
               <Profile />
+            </Suspense>
+          } />
+          <Route path="settings" element={
+            <Suspense fallback={<div className="w-full h-screen flex items-center justify-center"><div className="animate-pulse-gentle text-lilac">Loading...</div></div>}>
+              <Settings />
+            </Suspense>
+          } />
+          <Route path="checkout" element={
+            <Suspense fallback={<div className="w-full h-screen flex items-center justify-center"><div className="animate-pulse-gentle text-lilac">Loading...</div></div>}>
+              <Checkout />
             </Suspense>
           } />
           <Route path="/articles/:id" element={

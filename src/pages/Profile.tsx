@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,7 +22,9 @@ import {
   CreditCard,
   MessageSquare,
   Video,
-  UserRound
+  UserRound,
+  Settings,
+  LogOut
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,7 +62,7 @@ const mockOrders = [
 ];
 
 const Profile = () => {
-  const { user, isLoading, getSessionRequests } = useAuth();
+  const { user, isLoading, getSessionRequests, logout } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState(mockOrders);
   const [sessionRequests, setSessionRequests] = useState([]);
@@ -72,6 +75,11 @@ const Profile = () => {
 
   const startSession = (therapistId: string, type: 'chat' | 'video') => {
     navigate(`/session/${therapistId}/${type}`);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   if (isLoading) {
@@ -102,9 +110,27 @@ const Profile = () => {
           transition={{ duration: 0.5 }}
           className="max-w-5xl mx-auto"
         >
-          <div className="mb-10">
-            <h1 className="text-3xl font-bold mb-2">My Profile</h1>
-            <p className="text-foreground/70">Manage your account and view your healing journey</p>
+          <div className="mb-10 flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">My Profile</h1>
+              <p className="text-foreground/70">Manage your account and view your healing journey</p>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" asChild>
+                <Link to="/settings" className="flex items-center">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Link>
+              </Button>
+              <Button 
+                variant="destructive" 
+                className="flex items-center" 
+                onClick={handleLogout}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Log Out
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -158,7 +184,7 @@ const Profile = () => {
                 </CardContent>
                 <CardFooter>
                   <Button className="w-full" variant="outline" asChild>
-                    <Link to="/profile/settings">
+                    <Link to="/settings">
                       Edit Profile
                     </Link>
                   </Button>

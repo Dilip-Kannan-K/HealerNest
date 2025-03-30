@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Heart, Users, Lightbulb, BookOpen, CalendarDays, Headphones, ChevronRight, Check } from "lucide-react";
@@ -110,10 +109,10 @@ const Services = () => {
         "Therapy notes and progress tracking"
       ],
       pricing: [
-        { duration: "1 month", price: "$120", discount: null },
-        { duration: "3 months", price: "$340", discount: "5%" },
-        { duration: "6 months", price: "$650", discount: "10%" },
-        { duration: "Annual", price: "$1,200", discount: "15%" }
+        { duration: "1 month", price: "$120", discount: null, numericPrice: 120 },
+        { duration: "3 months", price: "$340", discount: "5%", numericPrice: 340 },
+        { duration: "6 months", price: "$650", discount: "10%", numericPrice: 650 },
+        { duration: "Annual", price: "$1,200", discount: "15%", numericPrice: 1200 }
       ]
     },
     {
@@ -129,10 +128,10 @@ const Services = () => {
         "Crisis support access"
       ],
       pricing: [
-        { duration: "1 month", price: "$220", discount: null },
-        { duration: "3 months", price: "$620", discount: "6%" },
-        { duration: "6 months", price: "$1,180", discount: "11%" },
-        { duration: "Annual", price: "$2,200", discount: "17%" }
+        { duration: "1 month", price: "$220", discount: null, numericPrice: 220 },
+        { duration: "3 months", price: "$620", discount: "6%", numericPrice: 620 },
+        { duration: "6 months", price: "$1,180", discount: "11%", numericPrice: 1180 },
+        { duration: "Annual", price: "$2,200", discount: "17%", numericPrice: 2200 }
       ]
     }
   ];
@@ -147,6 +146,11 @@ const Services = () => {
   
   // Handle subscription selection
   const handleChoosePlan = () => {
+    const currentPlan = subscriptionPlans.find(p => p.id === selectedPlan);
+    const currentPricing = getCurrentPricing();
+    
+    if (!currentPlan || !currentPricing) return;
+    
     if (isAuthenticated && user?.subscription?.status === "Active") {
       // Show warning toast if user already has active subscription
       toast.warning("You already have an active subscription. Please manage your subscription from your profile page.", {
@@ -157,9 +161,33 @@ const Services = () => {
         }
       });
     } else {
-      // Proceed to payment or registration
-      navigate("/get-started");
+      // Proceed to checkout
+      navigate("/checkout", {
+        state: {
+          item: {
+            type: 'subscription',
+            title: currentPlan.name,
+            price: currentPricing.numericPrice,
+            duration: currentPricing.duration,
+            description: currentPlan.description
+          }
+        }
+      });
     }
+  };
+  
+  // Handle service booking
+  const handleBookService = (service) => {
+    navigate("/checkout", {
+      state: {
+        item: {
+          type: 'service',
+          title: service.title,
+          price: parseInt(service.price.match(/\d+/)[0]), // Extract number from price string
+          description: service.description
+        }
+      }
+    });
   };
 
   return (
@@ -287,12 +315,12 @@ const Services = () => {
                   ))}
                 </ul>
                 
-                <Link 
-                  to="/connect" 
-                  className="block w-full py-3 text-center rounded-full bg-green text-foreground font-medium hover:bg-green/90 transition-all duration-300"
+                <Button 
+                  className="w-full py-3 text-center rounded-full bg-green text-foreground font-medium hover:bg-green/90 transition-all duration-300"
+                  onClick={() => handleBookService(service)}
                 >
                   Book Now
-                </Link>
+                </Button>
               </div>
             </motion.div>
           ))}
