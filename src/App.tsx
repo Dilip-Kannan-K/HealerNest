@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -30,6 +29,7 @@ const Session = lazy(() => import("./pages/Session"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Checkout = lazy(() => import("./pages/Checkout"));
+const Notifications = lazy(() => import("./pages/Notifications"));
 
 const queryClient = new QueryClient();
 
@@ -109,6 +109,11 @@ const AnimatedRoutes = () => {
           <Route path="/articles/:id" element={
             <Suspense fallback={<div className="w-full h-screen flex items-center justify-center"><div className="animate-pulse-gentle text-lilac">Loading...</div></div>}>
               <ArticleDetail />
+            </Suspense>
+          } />
+          <Route path="notifications" element={
+            <Suspense fallback={<div className="w-full h-screen flex items-center justify-center"><div className="animate-pulse-gentle text-lilac">Loading...</div></div>}>
+              <Notifications />
             </Suspense>
           } />
           <Route path="*" element={<NotFound />} />

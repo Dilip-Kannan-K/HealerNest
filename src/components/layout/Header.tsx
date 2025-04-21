@@ -1,12 +1,14 @@
 
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Plus, LogOut } from "lucide-react";
 import UserProfileButton from "../profile/UserProfileButton";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+// Import the bell icon from lucide
+import { Bell, BellDot } from "lucide-react";
+import { useDemoNotifications } from "@/hooks/useDemoNotifications";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,7 +16,8 @@ const Header = () => {
   const location = useLocation();
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
-  
+  const { unreadCount } = useDemoNotifications();
+
   // Close mobile menu when route changes
   useEffect(() => {
     setIsOpen(false);
@@ -59,35 +62,33 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            <Link
-              to="/partners"
-              className="nav-link relative text-foreground/70 hover:text-foreground transition-colors"
-            >
+            <Link to="/partners" className="nav-link relative text-foreground/70 hover:text-foreground transition-colors">
               Partners
             </Link>
-            <Link
-              to="/services"
-              className="nav-link relative text-foreground/70 hover:text-foreground transition-colors"
-            >
+            <Link to="/services" className="nav-link relative text-foreground/70 hover:text-foreground transition-colors">
               Services
             </Link>
-            <Link
-              to="/articles"
-              className="nav-link relative text-foreground/70 hover:text-foreground transition-colors"
-            >
+            <Link to="/articles" className="nav-link relative text-foreground/70 hover:text-foreground transition-colors">
               Articles
             </Link>
-            <Link
-              to="/affiliates"
-              className="nav-link relative text-foreground/70 hover:text-foreground transition-colors"
-            >
+            <Link to="/affiliates" className="nav-link relative text-foreground/70 hover:text-foreground transition-colors">
               Affiliates
             </Link>
-            <Link
-              to="/connect"
-              className="nav-link relative text-foreground/70 hover:text-foreground transition-colors"
-            >
+            <Link to="/connect" className="nav-link relative text-foreground/70 hover:text-foreground transition-colors">
               Connect
+            </Link>
+            {/* Notification bell */}
+            <Link to="/notifications" className="relative flex items-center ml-4 group">
+              {unreadCount > 0 ? (
+                <>
+                  <BellDot className="w-6 h-6 text-lilac animate-shake" aria-label="Notifications" />
+                  <span className="absolute -top-1 -right-1 bg-lilac text-white text-xs rounded-full px-1.5 py-0.5 leading-none font-semibold">
+                    {unreadCount}
+                  </span>
+                </>
+              ) : (
+                <Bell className="w-6 h-6 text-foreground/60 group-hover:text-foreground" aria-label="Notifications" />
+              )}
             </Link>
           </nav>
 
@@ -108,6 +109,20 @@ const Header = () => {
                 </Button>
               </div>
             )}
+
+            {/* Mobile Notifications bell */}
+            <Link to="/notifications" className="lg:hidden relative flex items-center">
+              {unreadCount > 0 ? (
+                <>
+                  <BellDot className="w-6 h-6 text-lilac animate-shake" aria-label="Notifications" />
+                  <span className="absolute -top-1 -right-1 bg-lilac text-white text-xs rounded-full px-1.5 py-0.5 leading-none font-semibold">
+                    {unreadCount}
+                  </span>
+                </>
+              ) : (
+                <Bell className="w-6 h-6 text-foreground/60" aria-label="Notifications" />
+              )}
+            </Link>
 
             {/* Mobile menu button */}
             <button
@@ -150,7 +165,14 @@ const Header = () => {
               <Link to="/connect" className="py-2 text-foreground/70 hover:text-foreground transition-colors">
                 Connect
               </Link>
-              
+              <Link to="/notifications" className="py-2 flex items-center text-foreground/70 hover:text-lilac transition-colors font-medium">
+                {unreadCount > 0 && (
+                  <span className="inline-flex items-center justify-center bg-lilac text-white rounded-full text-xs px-2 mr-2">
+                    {unreadCount}
+                  </span>
+                )}
+                Notifications
+              </Link>
               {isAuthenticated ? (
                 <>
                   <Link to="/profile" className="py-2 text-foreground/70 hover:text-foreground transition-colors">

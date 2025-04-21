@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -36,6 +35,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useDemoNotifications } from "@/hooks/useDemoNotifications";
+import * as AlertDialog from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const mockOrders = [
   {
@@ -66,12 +68,27 @@ const Profile = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState(mockOrders);
   const [sessionRequests, setSessionRequests] = useState([]);
+  const { unreadCount } = useDemoNotifications();
+  const { toast } = useToast();
+
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelTarget, setCancelTarget] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
       setSessionRequests(getSessionRequests());
     }
   }, [user, getSessionRequests]);
+
+  useEffect(() => {
+    if (user && unreadCount > 0) {
+      toast({
+        title: "You may have new messages, check notification.",
+        variant: "default"
+      });
+    }
+  }, [user]);
 
   const startSession = (therapistId: string, type: 'chat' | 'video') => {
     navigate(`/session/${therapistId}/${type}`);
@@ -80,6 +97,24 @@ const Profile = () => {
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const openCancelDialog = (sessionId: string) => {
+    setCancelTarget(sessionId);
+    setCancelReason("");
+    setCancelDialogOpen(true);
+  };
+
+  const handleCancelSession = () => {
+    setSessionRequests((requests: any) =>
+      requests.filter((req: any) => req.id !== cancelTarget)
+    );
+    setCancelDialogOpen(false);
+    toast({
+      title: "Session cancelled.",
+      description: cancelReason ? `Reason: ${cancelReason}` : undefined,
+      variant: "default"
+    });
   };
 
   if (isLoading) {
@@ -338,16 +373,32 @@ const Profile = () => {
                             </TableCell>
                             <TableCell>{new Date(request.createdAt).toLocaleDateString()}</TableCell>
                             <TableCell>
-                              <div className="flex gap-2">
-                                <Button size="sm" variant="outline" className="flex items-center gap-1 h-8 text-xs" 
-                                  onClick={() => startSession(request.therapist.id, 'chat')}>
+                              <div className="flex flex-col sm:flex-row gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex items-center gap-1 h-8 text-xs"
+                                  onClick={() => startSession(request.therapist.id, 'chat')}
+                                >
                                   <MessageSquare className="w-3 h-3" />
                                   Chat
                                 </Button>
-                                <Button size="sm" variant="outline" className="flex items-center gap-1 h-8 text-xs"
-                                  onClick={() => startSession(request.therapist.id, 'video')}>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex items-center gap-1 h-8 text-xs"
+                                  onClick={() => startSession(request.therapist.id, 'video')}
+                                >
                                   <Video className="w-3 h-3" />
                                   Video
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  className="flex items-center gap-1 h-8 text-xs"
+                                  onClick={() => openCancelDialog(request.id)}
+                                >
+                                  Cancel
                                 </Button>
                               </div>
                             </TableCell>
@@ -429,6 +480,33 @@ const Profile = () => {
           </div>
         </motion.div>
       </div>
+
+      <AlertDialog.AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialog.AlertDialogContent>
+          <AlertDialog.AlertDialogHeader>
+            <AlertDialog.AlertDialogTitle>Cancel Session Request</AlertDialog.AlertDialogTitle>
+            <AlertDialog.AlertDialogDescription>
+              Please let us know the reason for cancelling this session request.
+            </AlertDialog.AlertDialogDescription>
+          </AlertDialog.AlertDialogHeader>
+          <textarea
+            className="w-full rounded border p-2 mt-2 resize-y"
+            rows={3}
+            placeholder="Optional: Enter reason for cancelling..."
+            value={cancelReason}
+            onChange={e => setCancelReason(e.target.value)}
+          />
+          <AlertDialog.AlertDialogFooter>
+            <AlertDialog.AlertDialogCancel>Back</AlertDialog.AlertDialogCancel>
+            <AlertDialog.AlertDialogAction
+              className="bg-destructive text-white hover:bg-destructive/90"
+              onClick={handleCancelSession}
+            >
+              Cancel Session
+            </AlertDialog.AlertDialogAction>
+          </AlertDialog.AlertDialogFooter>
+        </AlertDialog.AlertDialogContent>
+      </AlertDialog.AlertDialog>
     </div>
   );
 };
